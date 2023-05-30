@@ -4,15 +4,16 @@
   <title>Login Form</title>
 </head>
 <body>
+  {% include "flash_messages.html" %}
   <h1>Login</h1>
-  <form action="/login" method="POST">
-    <label for="username">Username:</label>
-    <input type="text" id="username" name="username" required><br>
+  <form name ="login" method="POST">
+    {{ form.Username.label }}
+    {{ form.Username }}<br>
 
-    <label for="password">Password:</label>
-    <input type="password" id="password" name="password" required><br>
+    {{ form.Password.label }}
+    {{ form.Password }}<br>
 
-    <input type="submit" value="Login">
+    {{ form.Login }}
   </form>
 </body>
 </html>

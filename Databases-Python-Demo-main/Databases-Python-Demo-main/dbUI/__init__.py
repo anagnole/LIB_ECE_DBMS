@@ -23,5 +23,6 @@ db = MySQL(app)
 
 ## routes must be imported after the app object has been initialized
 from dbUI import routes
+from dbUI.login import routes
 app.register_blueprint(login)
 

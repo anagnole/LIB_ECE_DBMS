@@ -8,14 +8,12 @@ def index():
         ## create connection to database
         cur = db.connection.cursor()
         ## execute query
-        return render_template("landingtest.html",
+        return render_template("landing.html",
                                pageTitle = "Landing Page")
     except Exception as e:
         print(e)
-        return render_template("landingtest.html", pageTitle = "Landing Page")
+        return render_template("landing.html", pageTitle = "Landing Page")
     
-
-
 @app.errorhandler(404)
 def page_not_found(e):
     # note that we set the 404 status explicitly

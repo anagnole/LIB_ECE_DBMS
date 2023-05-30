@@ -2,16 +2,34 @@ from flask import Flask, render_template, request, flash, redirect, url_for, abo
 from flask_mysqldb import MySQL
 from dbUI import db ## initially created by __init__.py, need to be used here
 from dbUI.login import login
+from dbUI.login.forms import LoginForm
 
-@login.route("/login")
+@login.route("/login",methods = ["GET", "POST"])
 def getLogin():
-    try:
-        ##cur = db.connection.cursor()
-        return render_template("login.html", pageTitle = "Login Page")
-    except Exception as e:
-        ## if the connection to the database fails, return HTTP response 500
-        flash(str(e), "danger")
-        abort(500)
+        form = LoginForm() 
+        if(request.method == "POST" and form.validate_on_submit()):
+            ##logininfo = form.__dict__
+            ##query = ("SELECT role_user FROM users WHERE username = '{}' AND password = '{}';").format(logininfo['Username'].data, logininfo['Password'].data) 
+            try:
+                print(logininfo['Username'].data)
+                cur = db.connection.cursor()
+                ##role = cur.execute(query)
+                cur.close()
+                flash("Successful login", "success")
+                ##return redirect((url_for("login"))) 
+                return render_template("landing.html", pageTitle ="fefe")
+                '''
+                if (role == 'student'): 
+                    return redirect((url_for("student")))
+                else:
+                    return redirect((url_for("login"))) 
+                    '''
+            except Exception as e: ## OperationalError
+                flash(str(e), "danger")    
+        
+        return render_template("login.html", pageTitle = "Login Page", form = form)
+
+
 '''
 @student.route("/students/create", methods = ["GET", "POST"]) ## "GET" by default
 def createStudent():
