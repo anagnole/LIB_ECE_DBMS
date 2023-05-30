@@ -1,19 +1,32 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <title>Login Form</title>
-</head>
-<body>
+{% extends "global_layout.html" %}
+{% block content %}
+<div class="container">
   {% include "flash_messages.html" %}
-  <h1>Login</h1>
-  <form name ="login" method="POST">
-    {{ form.Username.label }}
-    {{ form.Username }}<br>
-
-    {{ form.Password.label }}
-    {{ form.Password }}<br>
-
-    {{ form.Login }}
-  </form>
-</body>
-</html>
+  <div>
+    <h1>Login</h1>
+    <form action="/login" method="POST">
+      {{ form.hidden_tag() }}
+      {{ form.username.label }}
+      {{ form.username (class = "form-control", placeholder = "Enter last name", required = False)}}<br>
+      {% if form.username.errors %}
+                    <ul class = "errors">
+                        {% for error in form.username.errors %}
+                        <li class = "text-danger">{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+      {{ form.password.label }}
+      {{ form.password (class = "form-control", placeholder = "Enter last name", required = False)}}<br>
+      {% if form.password.errors %}
+                    <ul class = "errors">
+                        {% for error in form.password.errors %}
+                        <li class = "text-danger">{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                    {% endif %}
+      {{ form.submit }}
+    </form>
+  </div>
+  
+</div>
+{% endblock content %}

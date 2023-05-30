@@ -2,6 +2,7 @@
 from flask import Flask
 from flask_mysqldb import MySQL
 from dbUI.login import login
+from dbUI.student import student
 
 ## __name__ is the name of the module. When running directly from python, it will be 'dbdemo'
 ## Outside of this module, as in run.py, it is '__main__' by default
@@ -24,5 +25,7 @@ db = MySQL(app)
 ## routes must be imported after the app object has been initialized
 from dbUI import routes
 from dbUI.login import routes
+from dbUI.student import routes
 app.register_blueprint(login)
+app.register_blueprint(student)
 
