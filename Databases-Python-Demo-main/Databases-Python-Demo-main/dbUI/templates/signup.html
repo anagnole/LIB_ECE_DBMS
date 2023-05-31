@@ -1,0 +1,67 @@
+{% extends "global_layout.html" %}
+{% block content %}
+<div class="container">
+    {% include "flash_messages.html" %}
+    <div>
+        <h1>Sign Up</h1>
+        <form action="/signup" method="POST">
+            {{ form.hidden_tag() }}
+
+            {{ form.First_Name.label }}
+            {{ form.First_Name(class = "form-control", placeholder = "Enter your first name", required = False) }}<br>
+            {% if form.First_Name.errors %}                
+                <ul class = "errors">
+                    {% for error in form.First_Name.errors %}
+                    <li class = "text-danger">{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {{ form.Last_Name.label }}
+            {{ form.Last_Name(class = "form-control", placeholder = "Enter your last name", required = False) }}<br>
+            {% if form.Last_Name.errors %}
+                <ul class = "errors">
+                    {% for error in form.Last_Name.errors %}
+                    <li class = "text-danger">{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {{ form.Username.label }}
+            {{ form.Username(class = "form-control", placeholder = "Enter username", required = False) }}<br>
+            {% if form.Username.errors %}
+                <ul class = "errors">
+                    {% for error in form.Username.errors %}
+                    <li class = "text-danger">{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {{ form.Password.label }}
+            {{ form.Password(class = "form-control", placeholder = "Enter password", required = False) }}<br>
+            {% if form.Password.errors %}
+                <ul class = "errors">
+                    {% for error in form.Password.errors %}
+                    <li class = "text-danger">{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            {{ form.Age.label }}
+            {{ form.Age(class = "form-control", placeholder = "Enter your age", required = False) }}<br>
+            {% if form.Age.errors %}
+                <ul class = "errors">
+                    {% for error in form.Age.errors %}
+                    <li class = "text-danger">{{ error }}</li>
+                    {% endfor %}
+                </ul>
+            {% endif %}
+
+            <div>Pick one</div>
+            {{ form.Role (class = "form-control", required = False)}}<br>
+
+            {{ form.SignUp }}
+        </form>
+    </div>
+</div>
+{% endblock content %}

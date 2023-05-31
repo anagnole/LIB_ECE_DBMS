@@ -7,23 +7,23 @@
     <form action="/login" method="POST">
       {{ form.hidden_tag() }}
       {{ form.username.label }}
-      {{ form.username (class = "form-control", placeholder = "Enter last name", required = False)}}<br>
+      {{ form.username (class = "form-control", placeholder = "Enter username", required = False)}}<br>
       {% if form.username.errors %}
-                    <ul class = "errors">
-                        {% for error in form.username.errors %}
-                        <li class = "text-danger">{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
+        <ul class = "errors">
+            {% for error in form.username.errors %}
+            <li class = "text-danger">{{ error }}</li>
+            {% endfor %}
+        </ul>
+      {% endif %}
       {{ form.password.label }}
-      {{ form.password (class = "form-control", placeholder = "Enter last name", required = False)}}<br>
+      {{ form.password (class = "form-control", placeholder = "Enter password", required = False)}}<br>
       {% if form.password.errors %}
-                    <ul class = "errors">
-                        {% for error in form.password.errors %}
-                        <li class = "text-danger">{{ error }}</li>
-                        {% endfor %}
-                    </ul>
-                    {% endif %}
+        <ul class = "errors">
+            {% for error in form.password.errors %}
+            <li class = "text-danger">{{ error }}</li>
+            {% endfor %}
+        </ul>
+      {% endif %}
       {{ form.submit }}
     </form>
   </div>
