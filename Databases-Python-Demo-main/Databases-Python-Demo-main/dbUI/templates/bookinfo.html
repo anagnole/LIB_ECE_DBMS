@@ -1,0 +1,59 @@
+{% extends "global_layout.html" %}
+{% block content %}
+<div class="container">
+    <head>
+        <title>Book Info</title>
+    </head>
+    <div>
+        <h1>Find out more information about:</h1>
+        <div class="table-responsive"></div>
+        <table id="bookinfo" class="table">
+            <tbody>
+                {% for book in books %}
+                <tr>
+                    <th>Book Title</th>
+                    <td> {{ book.title }} </td>
+                </tr>
+                <tr>
+                    <th>ISBN</th>
+                    <td> {{ book.ISBN }} </td>
+                </tr>
+                <tr>
+                    <th>Author(s)</th>
+                    <td> {{ book.authors }} </td>
+                </tr>
+                <tr>
+                    <th>Publisher</th>
+                    <td> {{ book.publisher }} </td>
+                </tr>
+                <tr>
+                    <th>Category</th>
+                    <td> {{ book.categories }} </td>
+                </tr>
+                <tr>
+                    <th>Number of pages</th>
+                    <td> {{ book.page_number }} </td>
+                </tr>
+                <tr>
+                    <th>Summary</th>
+                    <td> {{ book.summary }} </td>
+                </tr>
+                <tr>
+                    <th>Key Words</th>
+                    <td> {{ book.keywords }} </td>
+                </tr>
+                <tr>
+                    <th>Available copies</th>
+                    <td> {{ book.available_copies }} </td>
+                </tr>
+                <tr>
+                    <th>Language</th>
+                    <td> {{ book.b_language }} </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        </div>
+    </div>
+</div>
+{% endblock content %}

@@ -8,13 +8,13 @@
       <h1>Welcome to the Student Page</h1>
       <div class="button-container">
         <button id="profile" onclick = "window.location.href='/student/profile/' + '{{username}}'">Profile</button>
-        <button id="borrow" >Borrow Book</button>
+        <button id="borrow" onclick="window.location.href='/book/' + '{{ username }}'">Borrow Book</button>
       </div>
       <h2>Borrows</h2>
       {% if borrows|length == 0 %}
             <!-- |length is a jinja2 filter that returns the amount of items in a sequence -->
             <h2 style="margin-top: 5rem;">No Borrows found!</h1>
-        {% else %}
+      {% else %}
       <div class="table-responsive">
       <table id="borrows" class="table">
           <thead>

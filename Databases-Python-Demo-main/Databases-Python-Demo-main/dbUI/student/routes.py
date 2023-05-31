@@ -2,6 +2,8 @@ from flask import Flask, render_template, request, flash, redirect, url_for, abo
 from flask_mysqldb import MySQL
 from dbUI import db ## initially created by __init__.py, need to be used here
 from dbUI.student import student
+from dbUI.student.forms import StudentForm
+from dbUI.book import book
 
 @student.route("/student/<string:username>")
 def getStudent(username):
