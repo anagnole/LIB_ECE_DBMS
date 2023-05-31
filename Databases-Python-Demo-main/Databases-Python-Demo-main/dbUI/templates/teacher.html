@@ -2,12 +2,12 @@
 {% block content %}
 <div class="container">
   <head>
-      <title>Student Page</title>
+      <title>Teacher Page</title>
   </head>
   <div>
-      <h1>Welcome to the Student Page</h1>
+      <h1>Welcome to the Teacher Page</h1>
       <div class="button-container">
-        <button id="profile" onclick = "window.location.href='/student/profile/' + '{{username}}'">Profile</button>
+        <button id="profile" >Profile</button>
         <button id="borrow" >Borrow Book</button>
       </div>
       <h2>Borrows</h2>
@@ -21,7 +21,7 @@
             <tr>
                 <th>Book Title</th>
                 <th>Borrow Date</th>
-                <th>ret</th>
+                <th></th>
             </tr>
           </thead>
           <tbody>
@@ -29,7 +29,6 @@
                 <tr>
                     <td> {{ borrow.title }} </td>
                     <td> {{ borrow.b_date }} </td>
-                    <td> {{borrow.ret_date}}</td>
                 </tr>
             {% endfor %}
         </tbody>

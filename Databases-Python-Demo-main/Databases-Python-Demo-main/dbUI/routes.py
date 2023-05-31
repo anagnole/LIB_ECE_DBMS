@@ -4,14 +4,6 @@ from dbUI import app, db ## initially created by __init__.py, need to be used he
 
 @app.route("/")
 def index():
-    try:
-        ## create connection to database
-        cur = db.connection.cursor()
-        ## execute query
-        return render_template("landing.html",
-                               pageTitle = "Landing Page")
-    except Exception as e:
-        print(e)
         return render_template("landing.html", pageTitle = "Landing Page")
     
 @app.errorhandler(404)

@@ -3,6 +3,7 @@ from flask_mysqldb import MySQL
 from dbUI import db ## initially created by __init__.py, need to be used here
 from dbUI.login import login
 from dbUI.student import student
+from dbUI.teacher import teacher
 from dbUI.login.forms import LoginForm
 
 @login.route("/login",methods = ["GET", "POST"])
@@ -26,7 +27,7 @@ def getLogin():
             if (role == 'student'): 
                 return redirect((url_for("student.getStudent", username = logininfo['username'].data)))
             if (role == 'teacher'): 
-                return redirect((url_for("teacher")))
+                return redirect((url_for("teacher.getTeacher", username = logininfo['username'].data)))
             if (role == 'operator'): 
                 return redirect((url_for("operator")))
             if (role == 'admin'): 
