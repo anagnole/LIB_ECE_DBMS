@@ -50,9 +50,15 @@
                     <th>Language</th>
                     <td> {{ book.b_language }} </td>
                 </tr>
-            {% endfor %}
-            </tbody>
-        </table>
+                {% endfor %}
+                </tbody>
+            </table>
+            <form action="{{ url_for('bookinfo.borrow', username=username, ISBN=books[0].ISBN) }}" method="POST">
+                <button type="submit" class="button">Borrow</button>
+            </form>
+            <form action="{{ url_for('bookinfo.review', username=username, ISBN=books[0].ISBN) }}" method="POST">
+                <button type="submit" class="button">Review</button>
+            </form>                      
         </div>
     </div>
 </div>

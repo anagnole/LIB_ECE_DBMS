@@ -14,6 +14,7 @@ def getStudent(username):
         column_names = [i[0] for i in cur.description]
         borrows = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
         query = "SELECT b.title, r.r_date FROM reserves r INNER JOIN book b ON b.ISBN = r.ISBN WHERE r.username = '{}';".format(username)
+        cur.execute(query)
         column_names = [i[0] for i in cur.description]
         reserves = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
         cur.close()
