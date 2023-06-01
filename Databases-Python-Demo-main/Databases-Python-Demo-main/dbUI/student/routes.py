@@ -22,12 +22,14 @@ def getStudent(username):
     except Exception as e:
         abort(500)    
 
-@student.route("/student/profile/<string:username>"  ,methods=['GET', 'POST'])
+@student.route("/student/profile/<string:username>", methods=['GET', 'POST'])
 def getStudentProfile(username):
+    form = StudentForm()
+    if(request.method == "POST" and form.validate_on_submit()):
+        studentinfo = form.__dict__
     try:
         cur = db.connection.cursor()
-        query = "SELECT * FROM usernameview WHERE username = '{}';".format(username)
-
+        query = "SELECT * FROM usernameview u INNER JOIN users us ON u.username = us.username WHERE u.username = '{}';".format(username)
         cur.execute(query)
         column_names = [i[0] for i in cur.description]
         information = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
@@ -35,19 +37,8 @@ def getStudentProfile(username):
 
     except Exception as e:
         abort(500)      
-    button_pressed = False  # Initialize button_pressed with a default value
-    if request.method == 'POST':
-        button_pressed = request.form.get('button_pressed')
 
-    return render_template("student_profile.html", information=information[0], button_pressed=button_pressed, pageTitle="Student Profile")
+    return render_template("student_profile.html", information=information[0], pageTitle="Student Profile", form = form)
 
-    
-
-##
- ##   if(request.method == 'POST'):
- ##       return render_template("student_profile.html", information = information[0], button_pressed = button_pressed, pageTitle = "Student Profile")
- ##   button_pressed = request.form.get('button_pressed') 
- ##   return render_template("student_profile.html", information = information[0], button_pressed = False, pageTitle = "Student Profile")
-##
 
 

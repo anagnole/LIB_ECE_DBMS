@@ -3,31 +3,59 @@
 <div class="container">
   <head>
       <title>Student Profile</title>
+    <script>
+      function toggleDiv(x,y) {
+          var checkbox = document.getElementById(x);
+          var div = document.getElementById(y);
+    
+          if (checkbox.checked) {
+              div.style.display = 'inline-block';
+              document.getElementById('submit').style.display = 'block';
+          } else {
+              div.style.display = 'none';
+              document.getElementById('submit').style.display = 'none';
+          }
+      }
+    </script>
   </head>
   <div>
-      <h1>Welcome to the Student Profile</h1>
-      <form>
-         <button type = "submit" name="button_pressed" value="{{ not button_pressed}}"></button>
-      </form>
-      <h2>Name</h2>
+    <form action="/student/profile/{{information.username}}" method="POST">
+      {{ form.hidden_tag() }}
+      <h2>Your Profile</h2>
       <div>
+        <h3>Username</h3>
         <div>
           {{information.username}}
         </div>
+        <h3>First Name</h3>
         <div>
           {{information.First_name}}
-          {%if button_pressed %}
-            <div>
-              {{information.First_name}}
-            </div>
-          {%endif%}
+          <input type="checkbox" id="first" onclick="toggleDiv('first','firstdiv')">
+          <div class="updates" id="firstdiv">
+            {{form.first_name(class = "form-control", placeholder = "Enter your new first name", required = False)}}
+          </div>    
         </div>
-        {{information.Last_name}}
-
-
+        <h3>Last Name</h3>
+        <div>
+          {{information.Last_name}}
+          <input type="checkbox" id="last" onclick="toggleDiv('last','lastdiv')">
+          <div class="updates" id="lastdiv">
+            {{form.first_name(class = "form-control", placeholder = "Enter your new last name", required = False)}}
+          </div> 
+        </div>
+        <h3>Password</h3>
+        <div>
+          {{information.U_password}}
+          <input type="checkbox" id="pass" onclick="toggleDiv('pass','passdiv')">
+          <div class="updates" id="passdiv">
+            {{form.first_name(class = "form-control", placeholder = "Enter your new password", required = False)}}
+          </div> 
+        </div>
+        <div class="updates" id="submit">
+            {{form.submit}}
+        </div> 
       </div>
-      <h2>Reservations</h2>
-
+    </form>
   </div>
 </div>
 {% endblock content %}
