@@ -63,6 +63,10 @@
   font-size: 16px;
 }
 
+.updates {
+  display:none;
+}
+
 .btn-submit-custom {
   background-color: var(--bs-indigo);
   border-color: var(--bs-indigo);

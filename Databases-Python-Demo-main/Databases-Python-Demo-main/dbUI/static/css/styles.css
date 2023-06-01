@@ -10,6 +10,9 @@
   background-color: #dce9dd;
   border-radius: 10px;
 }
+.updates {
+  display:none;
+}
 
 body {
   display: flex;
