@@ -27,7 +27,7 @@ def getStudent(username):
         else:
             has = 0
         cur.close()
-        return render_template("student.html", borrows = borrows, username = username, reserves = reserves, library_card=library_card, has=has, pageTitle = "Student Page")
+        return render_template("student.html", borrows = borrows, username = username, reserves = reserves, has=has, pageTitle = "Student Page")
     except Exception as e:
         abort(500)    
 

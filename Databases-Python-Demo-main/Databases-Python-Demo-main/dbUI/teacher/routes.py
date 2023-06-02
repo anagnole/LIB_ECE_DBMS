@@ -9,6 +9,7 @@ from dbUI.book import book
 @teacher.route("/teacher/<string:username>")
 def getTeacher(username):
     try:
+        
         cur = db.connection.cursor()
         query = "SELECT b.title, bo.b_date FROM borrows bo INNER JOIN book b ON b.ISBN = bo.ISBN WHERE bo.username = '{}';".format(username)
         cur.execute(query)
@@ -21,26 +22,31 @@ def getTeacher(username):
         query = ("SELECT Library_card FROM approves_user WHERE username = '{}';".format(username))
         cur.execute(query)
         result = cur.fetchone()
-
+ 
         if result is not None:
             library_card = result[0]
             has = 1 if library_card == 1 else 0
         else:
             has = 0
-        print(library_card)
-        print(has)
         cur.close()
 
-        return render_template("teacher.html", borrows = borrows, username = username, reserves = reserves, library_card=library_card, has=has,pageTitle = "Teacher Page")
+        return render_template("teacher.html", borrows = borrows, username = username, reserves = reserves, has=has,pageTitle = "Teacher Page")
     except Exception as e:
         abort(500)    
 
-@teacher.route("/teacher/profile/<string:username>", methods=['GET', 'POST'])
-def getTeacherProfile(username):
 @teacher.route("/teacher/delete/<string:username>", methods=['GET', 'POST'])
 def deleteTeacher(username):
     if(request.method == "POST"):
         try:
+            query = "SELECT role_user FROM users WHERE username = '{}';".format(username)
+            cur = db.connection.cursor()
+            cur.execute(query)
+            row = cur.fetchone()
+            if(row):
+                role = row[0]
+            if(role == 'operator'):
+                raise ValueError("'Operators can't delete themselves'")
+            cur.close()
             query = "CALL delete_user('{}');".format(username)
             cur = db.connection.cursor()
             cur.execute(query)
@@ -48,7 +54,10 @@ def deleteTeacher(username):
             cur.close()
             return redirect(url_for("index"))
         except Exception as e:
-            abort(500)  
+            abort(500) 
+
+@teacher.route("/teacher/profile/<string:username>", methods=['GET', 'POST'])
+def getTeacherProfile(username): 
 
     form = TeacherForm()
 
