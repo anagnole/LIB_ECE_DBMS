@@ -37,6 +37,18 @@ def getTeacher(username):
 
 @teacher.route("/teacher/profile/<string:username>", methods=['GET', 'POST'])
 def getTeacherProfile(username):
+@teacher.route("/teacher/delete/<string:username>", methods=['GET', 'POST'])
+def deleteTeacher(username):
+    if(request.method == "POST"):
+        try:
+            query = "CALL delete_user('{}');".format(username)
+            cur = db.connection.cursor()
+            cur.execute(query)
+            db.connection.commit()
+            cur.close()
+            return redirect(url_for("index"))
+        except Exception as e:
+            abort(500)  
 
     form = TeacherForm()
 
