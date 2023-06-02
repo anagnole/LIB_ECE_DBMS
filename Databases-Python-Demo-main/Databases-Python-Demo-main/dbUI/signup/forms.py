@@ -9,7 +9,8 @@ class SignupForm(FlaskForm):
     Last_Name = StringField(label = "Last name", validators = [InputRequired(message = "Last name is a required field.")])
     Username = StringField(label = "Username", validators = [InputRequired(message = "Username is a required field.")])
     Password = IntegerField(label = "Password", validators = [InputRequired(message = "Password is a required field.")])
-    Age = IntegerField(label="Age", validators=[InputRequired(message="Age is a required field."),                                             NumberRange(min=18, max=99)])
+    Age = IntegerField(label="Age", validators=[InputRequired(message="Age is a required field."), 
+                                                NumberRange(min=18, max=99)])
     Role = SelectField('Role', choices=['student', 'teacher'])
     SignUp = SubmitField("SignUp")
 

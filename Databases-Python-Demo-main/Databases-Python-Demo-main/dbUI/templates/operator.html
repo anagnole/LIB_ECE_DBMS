@@ -1,0 +1,93 @@
+{% extends "global_layout.html" %}
+{% block content %}
+<div class="container">
+    <head>
+        <title>Operator Page</title>
+    </head>
+    <div>
+        <h1>Welcome to the Operator Page</h1>
+
+        <div class="button-container">
+            <button id="asteacher" onclick = "window.location.href= '/teacher/' + '{{username}}'">Continue as a teacher</button>
+            <button id="updatebook" onclick = "window.location.href= '/insertbook/'">Update books' info</button>
+            <button id="insertbook" onclick = "window.location.href= '/operator/{{ username }}/insertbook'">Insert new book</button>
+        </div>
+    </div>
+    
+    {% if books|length == 0 %}
+        <h2 style="margin-top: 5rem;">No books found!</h1>
+    {% else %}
+    <div class="table-responsive"></div>
+    <table id="book" class="table">
+        <thead>
+            <tr>
+                <th>Book Title</th>
+                <th>Book Authors</th>   
+            </tr>
+        </thead>
+        <tbody>
+        {% for book in books %}
+            <tr>
+                <td> {{ book.title }} </td>
+                <td> {{ book.authors }} </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    {%endif%}
+
+    {% if latereturns|length == 0 %}
+        <h2 style="margin-top: 5rem;">No late returns found!</h1>
+    {% else %}
+        <div class="table-responsive"></div>
+        <table id="latereturns" class="table">
+            <thead>
+                <tr>
+                    <th>ISBN</th>
+                    <th>User's First Name</th>
+                    <th>User's Last Name</th>   
+                    <th>Days Late</th>
+                </tr>
+            </thead>
+        <tbody>
+            {% for latereturn in latereturns %}
+            <tr>
+                <td> {{ latereturn.ISBN }} </td>
+                <td> {{ latereturn.v.First_name }} </td>
+                <td> {{ latereturn.v.Last_name }} </td>
+                <td> {{ latereturn.v.days_late }} </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {%endif%}
+
+        {% if latereturns|length == 0 %}
+        <h2 style="margin-top: 5rem;">No late returns found!</h1>
+    {% else %}
+        <div class="table-responsive"></div>
+        <table id="latereturns" class="table">
+            <thead>
+                <tr>
+                    <th>ISBN</th>
+                    <th>User's First Name</th>
+                    <th>User's Last Name</th>   
+                    <th>Days Late</th>
+                </tr>
+            </thead>
+        <tbody>
+            {% for latereturn in latereturns %}
+            <tr>
+                <td> {{ latereturn.ISBN }} </td>
+                <td> {{ latereturn.v.First_name }} </td>
+                <td> {{ latereturn.v.Last_name }} </td>
+                <td> {{ latereturn.v.days_late }} </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    {%endif%}
+
+
+</div>
+{% endblock content %}

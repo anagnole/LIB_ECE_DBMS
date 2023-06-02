@@ -29,7 +29,7 @@ def getLogin():
             if (role == 'teacher'): 
                 return redirect((url_for("teacher.getTeacher", username = logininfo['username'].data)))
             if (role == 'operator'): 
-                return redirect((url_for("operator")))
+                return redirect((url_for("operator.getOperator", username = logininfo['username'].data)))
             if (role == 'admin'): 
                 return redirect((url_for("admin")))
             else:

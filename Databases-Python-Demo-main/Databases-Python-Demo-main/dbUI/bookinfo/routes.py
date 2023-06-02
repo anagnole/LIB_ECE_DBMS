@@ -92,6 +92,7 @@ def review(username, ISBN):
             cur.execute(query)
             db.connection.commit()
             cur.close()
+            flash("Review submitted successfully!", "success")
             return redirect(url_for("bookinfo.getBookInfo", username = username, ISBN = ISBN))
         except Exception as e:
             flash(str(e), "danger")

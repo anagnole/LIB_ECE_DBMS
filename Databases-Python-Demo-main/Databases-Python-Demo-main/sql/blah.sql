@@ -25,5 +25,4 @@ CALL check_reserves();
 --Procedure approve_reviews(username, isbn)
 CALL approve_reviews('user12', 978000003);
 
-
 SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sorry, there is no available copy at the time. You have entered the reservation list.';

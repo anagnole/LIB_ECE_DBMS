@@ -1,0 +1,157 @@
+{% extends "global_layout.html" %}
+{% block content %}
+<div class="container">
+    <head>
+        <title>Insert new Book</title>
+    </head>
+    <body>
+        <h1>Insert new Book</h1>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <div>
+                {{ form.ISBN.label }}
+                {{ form.ISBN(class = "form-control", placeholder = "Enter ISBN", required = False) }}
+                {% if form.ISBN.errors %}
+                    <ul class="errors">
+                        {% for error in form.ISBN.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form.Title.label }}
+                {{ form.Title(class = "form-control", placeholder = "Enter the Title", required = False) }}
+                {% if form.Title.errors %}
+                    <ul class="errors">
+                        {% for error in form.Title.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form.Publisher.label }}
+                {{ form.Publisher(class = "form-control", placeholder = "Enter the publisher", required = False) }}
+                {% if form.Publisher.errors %}
+                    <ul class="errors">
+                        {% for error in form.Publisher.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form.Page_number.label }}
+                {{ form.Page_number(class = "form-control", placeholder = "Enter the number of pages", required = False) }}
+                {% if form.Page_number.errors %}
+                    <ul class="errors">
+                        {% for error in form.Page_number.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form.Summary.label }}
+                {{ form.Summary(class = "form-control", placeholder = "Enter a brief summary", required = False) }}
+                {% if form.Summary.errors %}
+                    <ul class="errors">
+                        {% for error in form.Summary.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form.Available_copies.label }}
+                {{ form.Available_copies(class = "form-control", placeholder = "Enter how many copies you can provide", required = False) }}
+                {% if form.Available_copies.errors %}
+                    <ul class="errors">
+                        {% for error in form.Available_copies.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form.img.label }}
+                {{ form.img(class = "form-control", placeholder = "Enter the image's url", required = False) }}
+                {% if form.img.errors %}
+                    <ul class="errors">
+                        {% for error in form.img.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form.B_language.label }}
+                {{ form.B_language(class = "form-control", placeholder = "Enter the language", required = False) }}
+                {% if form.B_language.errors %}
+                    <ul class="errors">
+                        {% for error in form.B_language.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form.Authors.label }}
+                {{ form.Authors(class="form-control", placeholder="Enter Authors (separated by commas)", required=False) }}
+                {% if form.Authors.errors %}
+                    <ul class="errors">
+                        {% for error in form.Authors.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form.Category.label }}
+                <div class="checkbox-group">
+                    {% for category in form.Category %}
+                        <div class="checkbox">
+                            <input type="checkbox" id="{{ category.id }}" name="{{ category.name }}" value="{{ category._value() }}">
+                            <label for="{{ category.id }}">{{ category.label.text }}</label>
+                        </div>
+                    {% endfor %}
+                </div>
+                {% if form.Category.errors %}
+                    <ul class="errors">
+                        {% for error in form.Category.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>            
+
+            <div>
+                {{ form.Key_words.label }}
+                {{ form.Key_words(class="form-control", placeholder="Enter Key words (separated by commas)", required=False) }}
+                {% if form.Key_words.errors %}
+                    <ul class="errors">
+                        {% for error in form.Key_words.errors %}
+                            <li>{{ error }}</li>
+                        {% endfor %}
+                    </ul>
+                {% endif %}
+            </div>
+
+            <div>
+                {{ form.submit() }}
+            </div>
+        </form>
+    </body>
+</div>
+{% endblock content %}
