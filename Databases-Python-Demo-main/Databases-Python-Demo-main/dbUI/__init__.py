@@ -5,6 +5,7 @@ from dbUI.login import login
 from dbUI.signup import signup
 from dbUI.student import student
 from dbUI.teacher import teacher
+from dbUI.operator import operator
 from dbUI.book import book
 from dbUI.bookinfo import bookinfo
 from dbUI.reviews import review
@@ -33,6 +34,7 @@ from dbUI.login import routes
 from dbUI.signup import routes
 from dbUI.student import routes
 from dbUI.teacher import routes
+from dbUI.operator import routes
 from dbUI.book import routes
 from dbUI.bookinfo import routes
 ##from dbUI.reviews import routes
@@ -43,3 +45,4 @@ app.register_blueprint(teacher)
 app.register_blueprint(book)
 app.register_blueprint(bookinfo)
 app.register_blueprint(review)
+app.register_blueprint(operator)

@@ -25,14 +25,14 @@ def getSignup():
             cur.execute(query)
             db.connection.commit()
             cur.close()
-            if signupinfo['Role'].data == 'Student':
+            if signupinfo['Role'].data == 'student':
                 return redirect(url_for("student.getStudent", username = signupinfo['Username'].data))
-            else:   
+            elif signupinfo['Role'].data == 'teacher':  
                 return redirect(url_for("teacher.getTeacher", username = signupinfo['Username'].data))
-                
+            else:
+                return redirect(url_for("operator.getOperator", username = signupinfo['Username'].data))
+
         except Exception as e: ## OperationalError
             flash("Sorry, Username already taken.", "danger")    
 
     return render_template("signup.html", form = form, pageTitle = "Sign Up Page")
-
-

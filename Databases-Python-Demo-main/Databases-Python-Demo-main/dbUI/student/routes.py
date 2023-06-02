@@ -17,8 +17,19 @@ def getStudent(username):
         cur.execute(query)
         column_names = [i[0] for i in cur.description]
         reserves = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
+        query = ("SELECT Library_card FROM approves_user WHERE username = '{}';".format(username))
+        cur.execute(query)
+        result = cur.fetchone()
+
+        if result is not None:
+            library_card = result[0]
+            has = 1 if library_card == 1 else 0
+        else:
+            has = 0
+        print(library_card)
+        print(has)
         cur.close()
-        return render_template("student.html", borrows = borrows, username = username, reserves = reserves, pageTitle = "Student Page")
+        return render_template("student.html", borrows = borrows, username = username, reserves = reserves, library_card=library_card, has=has, pageTitle = "Student Page")
     except Exception as e:
         abort(500)    
 

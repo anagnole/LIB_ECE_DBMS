@@ -54,7 +54,7 @@
                 </tbody>
             </table>
             <form action="{{ url_for('bookinfo.borrow', username=username, ISBN=books[0].ISBN) }}" method="POST">
-                <button type="submit" class="button">Borrow</button>
+                <button type="submit" class="button">Borrow / Reserve</button>
             </form>
             <form action="{{ url_for('bookinfo.review', username=username, ISBN=books[0].ISBN) }}" method="GET">
                 <button type="submit" class="button">Review</button>

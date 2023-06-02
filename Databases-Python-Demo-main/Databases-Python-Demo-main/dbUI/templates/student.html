@@ -10,9 +10,14 @@
         <button id="profile" onclick = "window.location.href='/student/profile/' + '{{username}}'">Profile</button>
         <button id="borrow" onclick="window.location.href='/book/' + '{{ username }}'">Browse Book Catalogue</button>
         <div class="card">
-          <h3>Library Card</h3>
-          <p><strong>Username:</strong> {{username}}</p>
-          <img class="profile-image" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Profile Picture">
+          {% if has == 1 %}
+            <h3>Library Card</h3>
+            <p><strong>Username:</strong> {{ username }}</p>
+            <img class="profile-image" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Profile Picture">
+          {% else %}
+            <h3>Unfortunately you do not own a library Card!</h3>
+            <p>Please wait for approval from an operator.</p>
+          {% endif %}
         </div>
       </div>
       
@@ -41,7 +46,7 @@
         </tbody>
         </table>
       </div>
-      {%endif%}
+      {% endif %}
   
       <h2>Reservations</h2>
 

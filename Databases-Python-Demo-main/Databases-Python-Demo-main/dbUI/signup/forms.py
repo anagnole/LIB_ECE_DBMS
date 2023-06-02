@@ -11,6 +11,6 @@ class SignupForm(FlaskForm):
     Password = IntegerField(label = "Password", validators = [InputRequired(message = "Password is a required field.")])
     Age = IntegerField(label="Age", validators=[InputRequired(message="Age is a required field."), 
                                                 NumberRange(min=18, max=99)])
-    Role = SelectField('Role', choices=['Student', 'Teacher'])
+    Role = SelectField('Role', choices=['student', 'teacher'])
     SignUp = SubmitField("SignUp")
 
