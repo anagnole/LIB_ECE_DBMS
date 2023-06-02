@@ -18,5 +18,17 @@ def getTeacher(username):
     except Exception as e:
         abort(500)    
 
+@teacher.route("/teacher/delete/<string:username>", methods=['GET', 'POST'])
+def deleteTeacher(username):
+    if(request.method == "POST"):
+        try:
+            query = "CALL delete_user('{}');".format(username)
+            cur = db.connection.cursor()
+            cur.execute(query)
+            db.connection.commit()
+            cur.close()
+            return redirect(url_for("index"))
+        except Exception as e:
+            abort(500)  
 
 

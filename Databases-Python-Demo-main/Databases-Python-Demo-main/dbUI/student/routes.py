@@ -3,7 +3,7 @@ from flask_mysqldb import MySQL
 from dbUI import db ## initially created by __init__.py, need to be used here
 from dbUI.student import student
 from dbUI.student.forms import StudentForm
-from dbUI import app
+from dbUI import routes
 from dbUI.book import book
 
 @student.route("/student/<string:username>")
@@ -21,14 +21,11 @@ def getStudent(username):
         query = ("SELECT Library_card FROM approves_user WHERE username = '{}';".format(username))
         cur.execute(query)
         result = cur.fetchone()
-
         if result is not None:
             library_card = result[0]
             has = 1 if library_card == 1 else 0
         else:
             has = 0
-        print(library_card)
-        print(has)
         cur.close()
         return render_template("student.html", borrows = borrows, username = username, reserves = reserves, library_card=library_card, has=has, pageTitle = "Student Page")
     except Exception as e:
@@ -92,20 +89,16 @@ def getStudentProfile(username):
 
     return render_template("student_profile.html", information=information[0], pageTitle="Student Profile", form = form)
     
-@student.route("/student/pr/<string:username>", methods=['GET', 'POST'])
+@student.route("/student/delete/<string:username>", methods=['GET', 'POST'])
 def deleteStudent(username):
-    print("teeeest")
     if(request.method == "POST"):
         try:
-            print("teeegest")
-            query = "DELETE FROM users WHERE Username = '{}';".format(
-                username
-                )
+            query = "CALL delete_user('{}');".format(username)
             cur = db.connection.cursor()
             cur.execute(query)
             db.connection.commit()
             cur.close()
-            return redirect(url_for("app.index"))
+            return redirect(url_for("index"))
         except Exception as e:
             abort(500)  
            
