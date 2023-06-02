@@ -10,7 +10,7 @@ from dbUI.book import book
 def getStudent(username):
     try:
         cur = db.connection.cursor()
-        query = "SELECT bo.ret_date, b.title, bo.b_date FROM borrows bo INNER JOIN book b ON b.ISBN = bo.ISBN WHERE bo.username = '{}';".format(username)
+        query = "SELECT b.title, bo.b_date FROM borrows bo INNER JOIN book b ON b.ISBN = bo.ISBN WHERE bo.username = '{}' AND bo.ret_date IS NULL;".format(username)
         cur.execute(query)
         column_names = [i[0] for i in cur.description]
         borrows = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
