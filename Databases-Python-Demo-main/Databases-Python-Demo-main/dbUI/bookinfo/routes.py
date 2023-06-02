@@ -4,7 +4,7 @@ from dbUI import db ## initially created by __init__.py, need to be used here
 from dbUI.book import book
 from dbUI.bookinfo import bookinfo
 from datetime import date
-from dbUI.reviews.forms import ReviewForm
+from dbUI.bookinfo.forms import ReviewForm
 
 def get_date():
     today = date.today()
@@ -63,9 +63,27 @@ def review(username, ISBN):
 
     if(request.method == "POST" and form.validate_on_submit()):
         reviewData = form.__dict__
-        query = ("INSERT INTO reviews (Rating, Username, ISBN, Comments) \
-                    VALUES ({},'{}',{},'{}');"
+        query_approval = ("SELECT role_user FROM users WHERE username = '{}';".format(username))
+        try:
+            cur = db.connection.cursor()
+            cur.execute(query_approval)
+            row = cur.fetchone()
+            if(row):
+                role = row[0] 
+            else: 
+                raise ValueError("'Incorrect Username or Password'")
+            cur.close()           
+            if (role == 'student'):
+                needs_approval = 1
+            else:
+                needs_approval = 0 
+        except Exception as e:
+            flash(str(e), "danger")
+            abort(500)
+        query = ("INSERT INTO reviews (Rating, Needs_approval, Username, ISBN, Comments) \
+                    VALUES ({},{},'{}',{},'{}');"
                     .format(reviewData['Rating'].data,
+                    needs_approval,
                     username,
                     ISBN,
                     reviewData['Comments'].data))
@@ -74,7 +92,7 @@ def review(username, ISBN):
             cur.execute(query)
             db.connection.commit()
             cur.close()
-            return render_template("review.html", username = username, ISBN = ISBN, pageTitle = "Review Page", form = form)
+            return redirect(url_for("bookinfo.getBookInfo", username = username, ISBN = ISBN))
         except Exception as e:
             flash(str(e), "danger")
             abort(500)

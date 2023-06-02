@@ -4,12 +4,14 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  width: 80%;
+  width: 90%;
   height: 70vh;
   margin: auto;
   background-color: #dce9dd;
   border-radius: 10px;
+  box-shadow: 5px 5px 0 0 rgb(75, 109, 39);
 }
+
 .updates {
   display:none;
 }
@@ -20,6 +22,7 @@ body {
   align-items: center;
   height: 100vh;
   margin: 0;
+  font-family: 'Times New Roman', serif;
 }
 
 header {
@@ -28,7 +31,7 @@ header {
   align-items: center;
   height: 35%;
   text-align: center;
-  font-family: 'EB Garamond';
+  font-family: 'Times New Roman', serif;
   font-size: 20px;
 }
 
@@ -38,27 +41,55 @@ main {
   justify-content: center;
   align-items: center;
   height: 65%;
-  font-family: Arial, serif;
+  font-family: 'Times New Roman', serif;
 }
 
 .button-container {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 10px;
+  gap: 20px;
 }
 
 button {
-  padding: 10px 15px;
-  font-size: 20px;
-  border-radius: 17px;
+  padding: 10px 10px;
+  font-size: 16px;
+  border-radius: 15px;
   border: none;
-  background-color: #a0d4a2;
+  background-color: #90c892;
   color: white;
   cursor: pointer;
-  transition: background-color 0.4s;
+  transition: background-color 0.5s;
+  font-family: 'Times New Roman', serif;
 }
 
 button:hover {
-  background-color: #6cbf6f;
+  background-color: #486e49;
+}
+
+.card {
+  position: relative;
+  width: 20%;
+  background-color: #f8f8f8;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 20px;
+  margin-bottom: 20px;
+  font-family: 'Times New Roman', serif;
+}
+
+.card h3 {
+  margin-top: 0;
+}
+.card p {
+  margin-bottom: 0;
+}
+
+.profile-image {
+  position: relative;
+ 
+}
+
+div {
+  display: block;
 }

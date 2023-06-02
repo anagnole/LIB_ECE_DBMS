@@ -8,8 +8,14 @@
       <h1>Welcome to the Student Page</h1>
       <div class="button-container">
         <button id="profile" onclick = "window.location.href='/student/profile/' + '{{username}}'">Profile</button>
-        <button id="borrow" onclick="window.location.href='/book/' + '{{ username }}'">Borrow Book</button>
+        <button id="borrow" onclick="window.location.href='/book/' + '{{ username }}'">Browse Book Catalogue</button>
+        <div class="card">
+          <h3>Library Card</h3>
+          <p><strong>Username:</strong> {{username}}</p>
+          <img class="profile-image" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Profile Picture">
+        </div>
       </div>
+      
       <h2>Borrows</h2>
       {% if borrows|length == 0 %}
             <!-- |length is a jinja2 filter that returns the amount of items in a sequence -->
