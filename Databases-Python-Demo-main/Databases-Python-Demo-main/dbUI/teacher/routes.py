@@ -27,16 +27,13 @@ def getTeacher(username):
             has = 1 if library_card == 1 else 0
         else:
             has = 0
-        print(library_card)
-        print(has)
         cur.close()
 
-        return render_template("teacher.html", borrows = borrows, username = username, reserves = reserves, library_card=library_card, has=has,pageTitle = "Teacher Page")
+        return render_template("teacher.html", borrows = borrows, username = username, reserves = reserves, has=has, pageTitle = "Teacher Page")
     except Exception as e:
         abort(500)    
 
-@teacher.route("/teacher/profile/<string:username>", methods=['GET', 'POST'])
-def getTeacherProfile(username):
+
 @teacher.route("/teacher/delete/<string:username>", methods=['GET', 'POST'])
 def deleteTeacher(username):
     if(request.method == "POST"):
@@ -50,10 +47,15 @@ def deleteTeacher(username):
         except Exception as e:
             abort(500)  
 
+@teacher.route("/teacher/profile/<string:username>", methods=['GET', 'POST'])
+def getTeacherProfile(username):
+
     form = TeacherForm()
 
     if(request.method == "POST" and form.validate_on_submit()):
+
         teacherinfo = form.__dict__
+        
         if teacherinfo["first_name"].data:
             try:
                 query = "UPDATE teacher_user SET teacher_first_name = '{}' WHERE Username = '{}';".format(
@@ -65,7 +67,7 @@ def deleteTeacher(username):
                 db.connection.commit()
                 cur.close()
             except Exception as e:
-                abort(500)  
+                abort(500)
 
         if teacherinfo["last_name"].data:
             try:
@@ -91,11 +93,25 @@ def deleteTeacher(username):
                 db.connection.commit()
                 cur.close()
             except Exception as e:
-                abort(500)                  
+                abort(500)     
+
+        if teacherinfo["age"].data:
+            try:
+                query = "UPDATE teacher_user SET age = '{}' WHERE Username = '{}';".format(
+                    teacherinfo["age"].data,
+                    username
+                    )
+                cur = db.connection.cursor()
+                cur.execute(query)
+                db.connection.commit()
+                cur.close()
+
+            except Exception as e:
+                abort(500)                
 
     try:
         cur = db.connection.cursor()
-        query = "SELECT * FROM usernameview u INNER JOIN users us ON u.username = us.username WHERE u.username = '{}';".format(username)
+        query = "SELECT us.username, u.First_name, u.Last_name, us.u_password, tu.age FROM usernameview u INNER JOIN users us ON u.username = us.username INNER JOIN teacher_user tu ON tu.username = u.username WHERE u.username = '{}';".format(username)
         cur.execute(query)
         column_names = [i[0] for i in cur.description]
         information = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
