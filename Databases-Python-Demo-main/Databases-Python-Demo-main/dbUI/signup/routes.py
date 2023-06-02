@@ -25,7 +25,7 @@ def getSignup():
             cur.execute(query)
             db.connection.commit()
             cur.close()
-            if signupinfo['Role'].data == 'Student':
+            if signupinfo['Role'].data == 'student':
                 return redirect(url_for("student.getStudent", username = signupinfo['Username'].data))
             else:   
                 return redirect(url_for("teacher.getTeacher", username = signupinfo['Username'].data))

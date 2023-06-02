@@ -18,11 +18,14 @@
       }
     </script>
   </head>
-  <div>
+  <div class = "table-container">
+    <form action="{{ url_for('student.deleteStudent', username=information.username) }}" method="POST">
+      <button type="submit" class="button">Delete</button>
+    </form>
     <form action="/student/profile/{{information.username}}" method="POST">
       {{ form.hidden_tag() }}
       <h2>Your Profile</h2>
-      <div>
+      <div class = "table">
         <h3>Username</h3>
         <div>
           {{information.username}}
@@ -40,7 +43,7 @@
           {{information.Last_name}}
           <input type="checkbox" id="last" onclick="toggleDiv('last','lastdiv')">
           <div class="updates" id="lastdiv">
-            {{form.first_name(class = "form-control", placeholder = "Enter your new last name", required = False)}}
+            {{form.last_name(class = "form-control", placeholder = "Enter your new last name", required = False)}}
           </div> 
         </div>
         <h3>Password</h3>
@@ -48,7 +51,7 @@
           {{information.U_password}}
           <input type="checkbox" id="pass" onclick="toggleDiv('pass','passdiv')">
           <div class="updates" id="passdiv">
-            {{form.first_name(class = "form-control", placeholder = "Enter your new password", required = False)}}
+            {{form.password(class = "form-control", placeholder = "Enter your new password", required = False)}}
           </div> 
         </div>
         <div class="updates" id="submit">

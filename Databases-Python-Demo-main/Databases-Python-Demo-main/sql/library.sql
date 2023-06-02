@@ -253,29 +253,33 @@ IF (SELECT Library_card FROM approves_user WHERE Newusername = username) = 0
     THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sorry, You do not have a library card.';
   END IF;
 IF EXISTS (SELECT 1 FROM book WHERE Available_copies = 0 AND ISBN = NEWISBN) THEN 
- IF (((SELECT Role_user FROM users WHERE username = NEWusername) = 'teacher') or (SELECT Role_user FROM users WHERE username = NEWusername) = 'operator')
-    AND ((SELECT count(*) from RESERVES WHERE username = NEWusername) = 2
-    OR ((SELECT DATEDIFF(current_timestamp, r_date) FROM reserves WHERE username = NEWusername) < 7) )
+ IF (((SELECT Role_user FROM users WHERE username = NEWusername) = 'teacher' or ((SELECT Role_user FROM users WHERE username = NEWusername) = 'operator'))
+    AND (((select count(*) from ((select isbn from reserves where username = NEWUsername) union (select isbn from borrows where username = NEWUsername and ret_date IS NULL)) as awrFg) = 2)
+    OR ((SELECT DATEDIFF(current_timestamp, r_date) FROM reserves WHERE username = NEWusername LIMIT 1) < 7) 
+    OR ((SELECT DATEDIFF(current_timestamp, b_date) FROM borrows WHERE username = NEWusername LIMIT 1) < 7)) )
       THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sorry, Teacher-user cannot reserve more than 1 book per week at the same time.';
   END IF;
-  IF ((SELECT Role_user FROM users WHERE username = NEWusername) = 'student' 
-    AND ((SELECT count(*) from reserves WHERE username = NEWusername) = 4) 
-    OR ((SELECT count(*) FROM reserves WHERE username = NEWusername AND DATEDIFF(current_timestamp, r_date) < 7) = 2))    
-    THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sorry, Student-user cannot reserve more than 2 books per week at the same time.';
+  IF (((SELECT Role_user FROM users WHERE username = NEWusername) = 'student') 
+    AND (((SELECT count(*) FROM ((select isbn from reserves where username = NEWUsername) union (select isbn from borrows where username = NEWUsername and ret_date IS NULL)) as wrFg) = 4) 
+    OR (SELECT count(*) FROM ((SELECT isbn FROM borrows WHERE username = NEWusername AND DATEDIFF(current_timestamp, b_date) < 7)
+    union (SELECT isbn FROM reserves WHERE username = NEWusername AND DATEDIFF(current_timestamp, r_date) < 7)) AS omit) = 2))
+      THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sorry, Student-user cannot reserve more than 2 books per week at the same time.';
   END IF;
   INSERT INTO RESERVES (USERNAME, ISBN, R_DATE) VALUES (NEWusername, NEWISBN, NEWB_DATE);
   
 ELSE 
   
-  IF ((SELECT Role_user FROM users WHERE username = NEWusername) = 'teacher' or ((SELECT Role_user FROM users WHERE username = NEWusername) = 'operator') 
-    AND ((SELECT count(*) from borrows WHERE username = NEWusername AND ret_date IS NULL) = 2
-    OR (SELECT DATEDIFF(current_timestamp, b_date) FROM borrows WHERE username = NEWusername AND ret_date IS NULL) < 7) )
+  IF (((SELECT Role_user FROM users WHERE username = NEWusername) = 'teacher' or ((SELECT Role_user FROM users WHERE username = NEWusername) = 'operator'))
+    AND (((select count(*) from ((select username from reserves where username = NEWUsername) union (select username from borrows where username = NEWUsername and ret_date IS NULL)) as awrg) = 2)
+    OR ((SELECT DATEDIFF(current_timestamp, b_date) FROM borrows WHERE username = NEWusername LIMIT 1) < 7)
+    OR ((SELECT DATEDIFF(current_timestamp, r_date) FROM reserves WHERE username = NEWusername LIMIT 1) < 7)) )
       THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sorry, Teacher-user cannot borrow more than 1 book per week at the same time.';
   END IF;
-  IF ((SELECT Role_user FROM users WHERE username = NEWusername) = 'student' 
-    AND ((SELECT count(*) from borrows WHERE username = NEWusername AND ret_date IS NULL) = 4) 
-    OR ((SELECT count(*) FROM borrows WHERE username = NEWusername AND ret_date IS NULL AND DATEDIFF(current_timestamp, b_date) < 7) = 2))    
-    THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sorry, Student-user cannot borrow more than 2 books per week at the same time.';
+  IF (((SELECT Role_user FROM users WHERE username = NEWusername) = 'student') 
+    AND (((SELECT count(*) FROM ((select username from reserves where username = NEWUsername) union (select username from borrows where username = NEWUsername and ret_date IS NULL)) as wrFg) = 4)
+    OR (SELECT count(*) FROM ((SELECT isbn FROM borrows WHERE username = NEWusername AND DATEDIFF(current_timestamp, b_date) < 7)
+    UNION (SELECT isbn FROM reserves WHERE username = NEWusername AND DATEDIFF(current_timestamp, r_date) < 7)) AS tabl) = 2))
+      THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sorry, Student-user cannot borrow more than 2 books per week at the same time.';
   END IF;
   IF EXISTS (SELECT 1 FROM BORROWS WHERE username=NEWusername AND DATEDIFF(current_timestamp, b_date)>14 AND ret_date IS NULL)
     THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sorry, Your return limit has expired.';
@@ -286,17 +290,42 @@ END $$
 
 CREATE PROCEDURE add_copies(
   IN isbn1 INT,
-  IN Username1 VARCHAR(45),
-  IN ret_date1 DATE)
+  IN Username1 VARCHAR(45)
+  )
 BEGIN
-UPDATE borrows SET ret_date = ret_date1 WHERE ISBN = isbn1 AND username = Username1; 
+UPDATE borrows SET ret_date = current_timestamp WHERE ISBN = isbn1 AND username = Username1; 
 UPDATE book SET Available_copies = Available_copies+1 WHERE isbn = isbn1;
   IF ((SELECT Available_copies FROM book where isbn1 = isbn ) = 1 AND EXISTS (SELECT 1 FROM reserves WHERE isbn1 = isbn)) THEN
-    CALL new_borrow(isbn1, (SELECT username FROM reserves WHERE isbn = isbn1 ORDER BY r_date), ret_date1);
-    DELETE FROM reserves WHERE isbn = isbn1 AND Username = (SELECT username FROM reserves WHERE isbn = isbn1);
-        
+    CALL new_borrow(isbn1, (SELECT username FROM reserves WHERE isbn = isbn1 ORDER BY r_date LIMIT 1), current_timestamp);
+    DELETE FROM reserves WHERE isbn = isbn1 AND Username = (SELECT username FROM reserves WHERE isbn = isbn1);  
   END IF;
+END $$
 
+CREATE PROCEDURE check_for_reserves(
+  IN isbn1 INT
+)
+BEGIN
+  IF ((SELECT Available_copies FROM book where isbn1 = isbn ) = 1 AND EXISTS (SELECT 1 FROM reserves WHERE isbn1 = isbn)) THEN
+    CALL new_borrow(isbn1, (SELECT username FROM reserves WHERE isbn = isbn1 ORDER BY r_date LIMIT 1), current_timestamp);
+    DELETE FROM reserves WHERE isbn = isbn1 AND Username = (SELECT username FROM reserves WHERE isbn = isbn1);  
+  END IF;
+END $$
+
+CREATE PROCEDURE delete_user(
+  IN Username1 VARCHAR(45)
+)
+BEGIN
+  myloop: LOOP    
+    IF ((SELECT count(*) FROM borrows WHERE username = Username1 AND ret_date IS NULL) = 0)
+     THEN
+      LEAVE myloop;
+    END IF;
+    CALL add_copies(
+      (SELECT b.isbn from book b INNER JOIN borrows bo ON b.ISBN = bo.ISBN WHERE bo.username = Username1 and bo.ret_date IS NULL LIMIT 1),
+      Username1
+      );
+  END LOOP myloop;
+DELETE FROM users WHERE username = Username1;
 END $$
 
 CREATE PROCEDURE add_school(

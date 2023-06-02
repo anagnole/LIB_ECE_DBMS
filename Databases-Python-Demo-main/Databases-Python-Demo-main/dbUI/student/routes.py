@@ -3,6 +3,7 @@ from flask_mysqldb import MySQL
 from dbUI import db ## initially created by __init__.py, need to be used here
 from dbUI.student import student
 from dbUI.student.forms import StudentForm
+from dbUI import app
 from dbUI.book import book
 
 @student.route("/student/<string:username>")
@@ -25,8 +26,48 @@ def getStudent(username):
 @student.route("/student/profile/<string:username>", methods=['GET', 'POST'])
 def getStudentProfile(username):
     form = StudentForm()
+
     if(request.method == "POST" and form.validate_on_submit()):
         studentinfo = form.__dict__
+        if studentinfo["first_name"].data:
+            try:
+                query = "UPDATE student_user SET student_first_name = '{}' WHERE Username = '{}';".format(
+                    studentinfo["first_name"].data,
+                    username
+                    )
+                cur = db.connection.cursor()
+                cur.execute(query)
+                db.connection.commit()
+                cur.close()
+            except Exception as e:
+                abort(500)  
+
+        if studentinfo["last_name"].data:
+            try:
+                query = "UPDATE student_user SET student_last_name = '{}' WHERE Username = '{}';".format(
+                    studentinfo["last_name"].data,
+                    username
+                    )
+                cur = db.connection.cursor()
+                cur.execute(query)
+                db.connection.commit()
+                cur.close()
+            except Exception as e:
+                abort(500)  
+
+        if studentinfo["password"].data:
+            try:
+                query = "UPDATE users SET U_password = '{}' WHERE Username = '{}';".format(
+                    studentinfo["password"].data,
+                    username
+                    )
+                cur = db.connection.cursor()
+                cur.execute(query)
+                db.connection.commit()
+                cur.close()
+            except Exception as e:
+                abort(500)                  
+
     try:
         cur = db.connection.cursor()
         query = "SELECT * FROM usernameview u INNER JOIN users us ON u.username = us.username WHERE u.username = '{}';".format(username)
@@ -39,6 +80,25 @@ def getStudentProfile(username):
         abort(500)      
 
     return render_template("student_profile.html", information=information[0], pageTitle="Student Profile", form = form)
-
+    
+@student.route("/student/pr/<string:username>", methods=['GET', 'POST'])
+def deleteStudent(username):
+    print("teeeest")
+    if(request.method == "POST"):
+        try:
+            print("teeegest")
+            query = "DELETE FROM users WHERE Username = '{}';".format(
+                username
+                )
+            cur = db.connection.cursor()
+            cur.execute(query)
+            db.connection.commit()
+            cur.close()
+            return redirect(url_for("app.index"))
+        except Exception as e:
+            abort(500)  
+           
+        
+   
 
 
