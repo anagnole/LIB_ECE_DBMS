@@ -9,13 +9,12 @@ from dbUI.book import book
 @teacher.route("/teacher/<string:username>")
 def getTeacher(username):
     try:
-        
         cur = db.connection.cursor()
-        query = "SELECT b.title, bo.b_date FROM borrows bo INNER JOIN book b ON b.ISBN = bo.ISBN WHERE bo.username = '{}';".format(username)
+        query = "SELECT b.ISBN, b.title, bo.b_date FROM borrows bo INNER JOIN book b ON b.ISBN = bo.ISBN WHERE bo.username = '{}' AND bo.ret_date IS NULL;".format(username)
         cur.execute(query)
         column_names = [i[0] for i in cur.description]
         borrows = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
-        query = "SELECT b.title, r.r_date FROM reserves r INNER JOIN book b ON b.ISBN = r.ISBN WHERE r.username = '{}';".format(username)
+        query = "SELECT b.ISBN, b.title, r.r_date FROM reserves r INNER JOIN book b ON b.ISBN = r.ISBN WHERE r.username = '{}';".format(username)
         cur.execute(query)
         column_names = [i[0] for i in cur.description]
         reserves = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
@@ -56,8 +55,6 @@ def deleteTeacher(username):
         except Exception as e:
             abort(500) 
 
-@teacher.route("/teacher/profile/<string:username>", methods=['GET', 'POST'])
-def getTeacherProfile(username): 
 
 @teacher.route("/teacher/profile/<string:username>", methods=['GET', 'POST'])
 def getTeacherProfile(username):
@@ -67,7 +64,7 @@ def getTeacherProfile(username):
     if(request.method == "POST" and form.validate_on_submit()):
 
         teacherinfo = form.__dict__
-        
+
         if teacherinfo["first_name"].data:
             try:
                 query = "UPDATE teacher_user SET teacher_first_name = '{}' WHERE Username = '{}';".format(

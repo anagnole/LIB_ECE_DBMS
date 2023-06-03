@@ -5,6 +5,8 @@ from dbUI.book import book
 from dbUI.bookinfo import bookinfo
 from datetime import date
 from dbUI.bookinfo.forms import ReviewForm
+from dbUI.student import student
+from dbUI.teacher import teacher
 
 def get_date():
     today = date.today()
@@ -53,6 +55,69 @@ def borrow(username, ISBN):
         # If the connection to the database fails, return HTTP response 500
         flash(str(e), "danger")
         abort(500)
+
+@bookinfo.route("/bookinfo/<string:username>/<int:ISBN>/return", methods=["POST"])
+def returnbook(username, ISBN):
+    """
+    Call the add_copies procedure with username and ISBN as arguments
+    """
+    try:
+        query = ("SELECT role_user FROM users WHERE username = '{}';").format(username)
+        cur = db.connection.cursor()
+        cur.execute(query)
+        row = cur.fetchone()
+        if(row):
+            role = row[0]
+        else: 
+            raise ValueError("'Incorrect Username or Password'")
+        cur.close()
+
+        cur = db.connection.cursor()
+        todaydate = get_date()
+        query = "CALL add_copies({}, '{}');".format(ISBN, username)
+        cur.execute(query)
+        db.connection.commit()
+        cur.close()
+        flash("Book returned successfully", "success")
+        if (role == 'student'):
+            return redirect((url_for("student.getStudent", username = username, ISBN=ISBN)))
+        else:
+            return redirect((url_for("teacher.getTeacher", username = username, ISBN=ISBN)))
+    except Exception as e:
+        # If the connection to the database fails, return HTTP response 500
+        flash(str(e), "danger")
+        abort(500)
+
+@bookinfo.route("/bookinfo/<string:username>/<int:ISBN>/cancel", methods=["POST"])
+def cancel(username, ISBN):
+    try:
+        cur = db.connection.cursor()
+        query = ("SELECT role_user FROM users WHERE username = '{}';").format(username)
+        cur.execute(query)
+        row = cur.fetchone()
+        if(row):
+            role = row[0]
+        else: 
+            raise ValueError("'Incorrect Username or Password'")
+        cur.close()
+
+        cur = db.connection.cursor()
+        query = "DELETE FROM reserves WHERE username = '{}' AND isbn = {};".format(username, ISBN)
+        cur.execute(query)
+        db.connection.commit()
+        cur.close()
+
+        flash("Reservation cancelled successfully", "success")
+        if (role == 'student'):
+            return redirect((url_for("student.getStudent", username = username, ISBN=ISBN)))
+        else:
+            return redirect((url_for("teacher.getTeacher", username = username, ISBN=ISBN)))
+
+    except Exception as e:
+        # If the connection to the database fails, return HTTP response 500
+        flash(str(e), "danger")
+        abort(500)
+
 
 @bookinfo.route("/bookinfo/<string:username>/<int:ISBN>/review", methods=["GET", "POST"])
 def review(username, ISBN):
