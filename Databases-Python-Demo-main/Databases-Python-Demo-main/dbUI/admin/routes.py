@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, flash, redirect, url_for, abort
 from flask_mysqldb import MySQL
+import subprocess
 from dbUI import db ## initially created by __init__.py, need to be used here
 from dbUI.operator import operator
 from dbUI.admin import admin
@@ -7,11 +8,25 @@ from dbUI.admin.forms import AdminForm
 from dbUI.admin.forms import Admin2Form
 from dbUI.admin.forms import CreateSchool
 
-@admin.route("/admin")
+@admin.route("/admin" ,methods=["GET","POST"])
 def getAdmin():
     try:
+        if request.method == 'POST':
+            if request.form.get('action') == 'backup':
+                backup_path = 'sql/backup.sql' 
+                backup_command = ['C:/xampp/mysql/bin/mysqldump', '--user=root', 'library', '--result-file=' + backup_path]
+                subprocess.run(backup_command)
+                return redirect(url_for("admin.getAdmin"))
+            
+            elif request.form.get('action') == 'restore':
+                backup_path = 'sql/backup.sql' 
+                restore_command = ['C:/xampp/mysql/bin/mysql', '--user=root', 'library', '-e', 'source {}'.format(backup_path)]
+                subprocess.run(restore_command)
+                
+                return redirect(url_for("admin.getAdmin"))
         return render_template("admin.html", pageTitle = "Admin Page")
     except Exception as e:
+        print(e)
         abort(500)  
 
 @admin.route("/admin/statistics" ,methods = ["GET", "POST"])

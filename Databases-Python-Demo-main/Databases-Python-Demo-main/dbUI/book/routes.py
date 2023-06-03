@@ -86,3 +86,21 @@ def getInsertBook(username):
             abort(500)
 
     return render_template("insertbook.html", username=username, form=form, pageTitle="Insert Book")
+
+@book.route("/update_book/<string:username>")
+def getUpdateBook(username):
+    try:
+        cur = db.connection.cursor()
+        search = "SELECT b.ISBN, b.title, b.available_copies FROM book b \
+        INNER JOIN operator o ON o.Operator_ID = b.Operator_ID WHERE o.username = '{}';".format(username)
+        cur.execute(search)
+   
+        column_names = [i[0] for i in cur.description]
+        books = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
+        cur.close()
+        return render_template("update_book.html", books = books, username=username, pageTitle = "Update Books")
+
+    except Exception as e:
+        ## if the connection to the database fails, return HTTP response 500
+        flash(str(e), "danger")
+        abort(500)

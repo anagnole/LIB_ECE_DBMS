@@ -5,6 +5,7 @@ from dbUI.book import book
 from dbUI.bookinfo import bookinfo
 from datetime import date
 from dbUI.bookinfo.forms import ReviewForm
+from dbUI.bookinfo.forms import UpdateBookForm
 from dbUI.student import student
 from dbUI.teacher import teacher
 
@@ -164,4 +165,77 @@ def review(username, ISBN):
             abort(500)
     return render_template("review.html", username=username, ISBN=ISBN, pageTitle="Review Page", form=form)
 
-## META TO REVIEW ΓΥΡΙΖΕΙ ΠΙΣΩ?????????????? 
+@bookinfo.route("/update_book_info/<int:ISBN>", methods = ["GET", "POST"])
+def UpdateBookInfo(ISBN):
+    form = UpdateBookForm()
+    if (request.method == "POST" and form.validate_on_submit()):
+        insertbookinfo = form.__dict__
+        query_update_book = "UPDATE book SET Title = %s, Publisher = %s, Page_number = %s, \
+                    Summary = %s, Available_copies = %s, B_language = %s  \
+                    WHERE ISBN = %s;"
+        query_delete_authors = "DELETE FROM written_by where isbn = %s;"
+        query_pick_author = "CALL pick_author(%s, %s);"
+        query_delete_category = "DELETE FROM belongs_to where isbn = %s;"
+        query_insert_category = "INSERT INTO belongs_to (ISBN, C_name) VALUES (%s, %s);"
+        selected_categories = form.Category.data
+        query_delete_key = "DELETE FROM key_words WHERE ISBN = %s;"
+        query_insert_keywords = "INSERT INTO key_words (ISBN, Key_word) VALUES (%s, %s);"
+
+        try:
+            cur = db.connection.cursor()
+            cur.execute(
+                query_update_book,
+                (
+                    insertbookinfo["Title"].data,
+                    insertbookinfo["Publisher"].data,
+                    insertbookinfo["Page_number"].data,
+                    insertbookinfo["Summary"].data,
+                    insertbookinfo["Available_copies"].data,
+                    insertbookinfo["B_language"].data,
+                    ISBN
+                ),
+            )
+            print("awrghwiluh")
+            cur.execute(query_delete_authors, (ISBN,))
+            print("x")
+            authors = insertbookinfo["Authors"].data.split(",")
+            print("1")
+            for author in authors:
+                cur.execute(query_pick_author, (ISBN, author.strip()))
+            cur.execute(query_delete_category, (ISBN,))
+            for category in selected_categories:
+                cur.execute(query_insert_category, (ISBN, category.strip()))
+            
+            cur.execute(query_delete_key, (ISBN,))
+            keywords = insertbookinfo["Key_words"].data.split(",")
+            for keyword in keywords:
+                cur.execute(query_insert_keywords, (ISBN, keyword.strip()))
+
+            db.connection.commit()
+            cur.close()
+            flash("Book created successfully!", "success")
+            return redirect(url_for("bookinfo.UpdateBookInfo", ISBN=ISBN))
+        except Exception as e:
+            print(e)
+            flash(str(e), "danger")
+            abort(500)
+
+    try:
+        cur = db.connection.cursor()
+        query = ("SELECT DISTINCT b.ISBN, GROUP_CONCAT(DISTINCT a.Ath_full_name SEPARATOR ', ') AS authors, b.title, b.publisher, GROUP_CONCAT(DISTINCT c.c_name SEPARATOR ', ') AS categories, b.page_number, b.summary, GROUP_CONCAT(DISTINCT k.key_word SEPARATOR ', ') AS keywords, b.available_copies, b.b_language FROM book b \
+        INNER JOIN written_by w ON b.isbn = w.isbn \
+        INNER JOIN authors a ON a.author_ID = w.author_ID \
+        INNER JOIN belongs_to be ON be.isbn = b.isbn \
+        INNER JOIN category c ON c.c_name = be.c_name \
+        INNER JOIN key_words k ON k.isbn = b.isbn \
+        WHERE b.isbn = '{}';").format(ISBN)
+        cur.execute(query)
+        column_names = [i[0] for i in cur.description]
+        books = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
+        cur.close()
+        return render_template("update_book_info.html", books = books, isbn = ISBN, form = form, pageTitle = "Book Info")
+    except Exception as e:
+        print(e)
+        ## if the connection to the database fails, return HTTP response 500
+        flash(str(e), "danger")
+        abort(500)

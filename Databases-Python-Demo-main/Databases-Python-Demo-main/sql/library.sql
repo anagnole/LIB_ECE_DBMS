@@ -288,6 +288,18 @@ ELSE
 END IF;
 END $$
 
+CREATE PROCEDURE update_copies(
+  IN isbn1 INT
+  )
+BEGIN
+UPDATE book SET Available_copies = Available_copies + 1 WHERE isbn = isbn1;
+  IF ((SELECT Available_copies FROM book where isbn1 = isbn ) = 1 AND EXISTS (SELECT 1 FROM reserves WHERE isbn1 = isbn)) THEN
+    UPDATE reserves SET r_date = '2023-5-5' WHERE isbn = isbn1 and username = (SELECT username FROM reserves WHERE isbn = isbn1 ORDER BY r_date LIMIT 1);
+    CALL new_borrow(isbn1, (SELECT username FROM reserves WHERE isbn = isbn1 ORDER BY r_date LIMIT 1), current_timestamp);
+    DELETE FROM reserves WHERE isbn = isbn1 AND Username = (SELECT username FROM reserves WHERE isbn = isbn1);  
+  END IF;
+END $$
+
 CREATE PROCEDURE add_copies(
   IN isbn1 INT,
   IN Username1 VARCHAR(45)
@@ -296,6 +308,7 @@ BEGIN
 UPDATE borrows SET ret_date = current_timestamp WHERE ISBN = isbn1 AND username = Username1; 
 UPDATE book SET Available_copies = Available_copies+1 WHERE isbn = isbn1;
   IF ((SELECT Available_copies FROM book where isbn1 = isbn ) = 1 AND EXISTS (SELECT 1 FROM reserves WHERE isbn1 = isbn)) THEN
+    UPDATE reserves SET r_date = '2023-5-5' WHERE isbn = isbn1 and username = (SELECT username FROM reserves WHERE isbn = isbn1 ORDER BY r_date LIMIT 1);
     CALL new_borrow(isbn1, (SELECT username FROM reserves WHERE isbn = isbn1 ORDER BY r_date LIMIT 1), current_timestamp);
     DELETE FROM reserves WHERE isbn = isbn1 AND Username = (SELECT username FROM reserves WHERE isbn = isbn1);  
   END IF;
