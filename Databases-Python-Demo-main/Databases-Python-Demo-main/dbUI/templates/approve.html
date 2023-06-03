@@ -1,0 +1,59 @@
+{% extends "global_layout.html" %}
+{% block content %}
+<div class="container">
+    <head>
+        <title>Approve Library Cards and Reviews</title>
+    </head>
+    <body>
+        <h3>Approve Library Cards</h3>
+        <p>Click to appove the request!</p>
+        {% if librarycards|length == 0 %}
+        <h2 style="margin-top: 5rem;">No library card approvals pending!</h2>
+        {% else %}
+        <div class="table-responsive">
+            <table id="librarycards" class="table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for librarycard in librarycards %}
+                    <tr class="clickable-row" onclick="location.href='/operator/{{ username }}/approve/librarycard?username={{ librarycard.username }}';">
+                        <td>{{ librarycard.username }}</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+
+        <h3>Approve Reviews</h3>
+        <p>Click to appove the request!</p>
+        {% if reviews|length == 0 %}
+        <h2 style="margin-top: 5rem;">No review approvals pending!</h2>
+        {% else %}
+        <div class="table-responsive">
+            <table id="reviews" class="table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Rating</th>
+                        <th>Comments</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for review in reviews %}
+                    <tr class="clickable-row" onclick="location.href='/operator/{{ username }}/approve/review?username={{ review.username }}';">
+                        <td>{{ review.username }}</td>
+                        <td>{{ review.rating }}</td>
+                        <td>{{ review.comments }}</td>                  
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        {% endif %}
+    </body>
+</div>
+{% endblock content %}

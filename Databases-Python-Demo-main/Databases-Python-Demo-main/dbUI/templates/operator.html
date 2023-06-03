@@ -11,84 +11,154 @@
             <button id="asteacher" onclick = "window.location.href= '/teacher/' + '{{username}}'">Continue as a teacher</button>
             <button id="updatebook" onclick = "window.location.href= '/insertbook/'">Update books' info</button>
             <button id="insertbook" onclick = "window.location.href= '/operator/{{ username }}/insertbook'">Insert new book</button>
+            <button id="approve" onclick = "window.location.href= '/operator/{{ username }}/approve'">Approve library cards and reviews</button>
         </div>
     </div>
+
+    <h3>Books listed</h3>
     
+    <form action="/operator/{{ username }}" method="GET">
+        <input type="text" name="searchtitle" placeholder="Search for a title">
+        <button type="submit">Search for a title</button>
+    </form>
+
+    <form action="/operator/{{ username }}" method="GET">
+        <input type="text" name="searchcategory" placeholder="Search for a category">
+        <button type="submit">Search for a category</button>
+    </form>
+
+    <form action="/operator/{{ username }}" method="GET">
+        <input type="text" name="searchauthor" placeholder="Search for an author">
+        <button type="submit">Search for an author</button>
+    </form>
+
+    <form action="/operator/{{ username }}" method="GET">
+        <input type="text" name="searchcopies" placeholder="Search for available copies">
+        <button type="submit">Search for available copies</button>
+    </form>
+
     {% if books|length == 0 %}
-    <h2 style="margin-top: 5rem;">No books found!</h1>
-{% else %}
-<div class="table-responsive"></div>
-<table id="book" class="table">
-    <thead>
-      <tr>
-          <th>Book Title</th>
-          <th>Authors</th>
-          <th></th>
-      </tr>
-    </thead>
-    <tbody>
-      {% for book in books %}
-          <tr>
-                <td>{{ book.title }}</a></td>
-                <td> {{ book.authors }} </td>
-          </tr>
-      {% endfor %}
-  </tbody>
-  </table>
-{%endif%}
+    <h2 style="margin-top: 5rem;">No books found!</h2>
+    {% else %}
+    <div class="table-responsive">
+        <table id="book" class="table">
+            <thead>
+                <tr>
+                    <th>Book Title</th>
+                    <th>Authors</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for book in books %}
+                    <tr>
+                        <td>{{ book.title }}</td>
+                        <td>{{ book.authors }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+    {% endif %}
+
+    <h3>Users who must return books</h3>
+    
+    <form action="/operator/{{ username }}" method="GET">
+        <input type="text" name="searchfirstname" placeholder="Search for a first name">
+        <button type="submit">Search for a First Name</button>
+    </form>
+
+    <form action="/operator/{{ username }}" method="GET">
+        <input type="text" name="searchlastname" placeholder="Search for a last name">
+        <button type="submit">Search for a Last Name</button>
+    </form>
+
+    <form action="/operator/{{ username }}" method="GET">
+        <input type="text" name="searchdayslate" placeholder="Search for days late">
+        <button type="submit">Search for Days Late</button>
+    </form>
 
     {% if latereturns|length == 0 %}
-        <h2 style="margin-top: 5rem;">No late returns found!</h1>
+        <h2 style="margin-top: 5rem;">No late returns found!</h2>
     {% else %}
-        <div class="table-responsive"></div>
+        <div class="table-responsive">
         <table id="latereturns" class="table">
             <thead>
                 <tr>
-                    <th>ISBN</th>
                     <th>User's First Name</th>
                     <th>User's Last Name</th>   
-                    <th>Days Late</th>
                 </tr>
             </thead>
-        <tbody>
+            <tbody>
             {% for latereturn in latereturns %}
-            <tr>
-                <td> {{ latereturn.ISBN }} </td>
-                <td> {{ latereturn.v.First_name }} </td>
-                <td> {{ latereturn.v.Last_name }} </td>
-                <td> {{ latereturn.v.days_late }} </td>
-            </tr>
-            {% endfor %}
-        </tbody>
-    </table>
-    {%endif%}
-
-        {% if latereturns|length == 0 %}
-        <h2 style="margin-top: 5rem;">No late returns found!</h1>
-    {% else %}
-        <div class="table-responsive"></div>
-        <table id="latereturns" class="table">
-            <thead>
                 <tr>
-                    <th>ISBN</th>
-                    <th>User's First Name</th>
-                    <th>User's Last Name</th>   
-                    <th>Days Late</th>
+                    
+                    <td> {{ latereturn.first_name }} </td>
+                    <td> {{ latereturn.last_name }} </td>
                 </tr>
-            </thead>
-        <tbody>
-            {% for latereturn in latereturns %}
-            <tr>
-                <td> {{ latereturn.ISBN }} </td>
-                <td> {{ latereturn.v.First_name }} </td>
-                <td> {{ latereturn.v.Last_name }} </td>
-                <td> {{ latereturn.v.days_late }} </td>
-            </tr>
             {% endfor %}
-        </tbody>
-    </table>
-    {%endif%}
+            </tbody>
+        </table>
+        </div>
+        {%endif%}
 
+        <h3>Mean rating per User and Category</h3>
+
+        <form action="/operator/{{ username }}" method="GET">
+            <input type="text" name="searchusername" placeholder="Search for username">
+            <button type="submit">Search for Username</button>
+        </form>
+        
+        {% if usermeanrating|length == 0 and categorymeanrating|length == 0 %}
+            <h2 style="margin-top: 5rem;">No mean ratings found!</h2>
+        {% else %}
+            {% if usermeanrating|length > 0 %}
+                <div class="table-responsive">
+                    <table id="usermeanrating" class="table">
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for meanrating in usermeanrating %}
+                                <tr>
+                                    <td>{{ meanrating.username }}</td>
+                                    <td>{{ meanrating.rating }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        
+            <form action="/operator/{{ username }}" method="GET">
+                <input type="text" name="searchcategory" placeholder="Search for category">
+                <button type="submit">Search for Category</button>
+            </form>
+
+            {% if categorymeanrating|length > 0 %}
+                <div class="table-responsive">
+                    <table id="categorymeanrating" class="table">
+                        <thead>
+                            <tr>
+                                <th>Category</th>
+                                <th>Rating</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for meanrating in categorymeanrating %}
+                                <tr>
+                                    <td>{{ meanrating.c_name }}</td>
+                                    <td>{{ meanrating.rating }}</td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% endif %}
+        {% endif %}
+        
 
 </div>
 {% endblock content %}
