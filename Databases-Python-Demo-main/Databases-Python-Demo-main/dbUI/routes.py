@@ -4,6 +4,15 @@ from dbUI import app, db ## initially created by __init__.py, need to be used he
 
 @app.route("/")
 def index():
+        query = "CALL check_reserves();"
+        try:
+            cur = db.connection.cursor()
+            cur.execute(query)
+            db.connection.commit()
+            cur.close()
+        except Exception as e: ## OperationalError
+            flash("Something wrong with reserves", "danger")   
+             
         return render_template("landing.html", pageTitle = "Landing Page")
     
 @app.errorhandler(404)

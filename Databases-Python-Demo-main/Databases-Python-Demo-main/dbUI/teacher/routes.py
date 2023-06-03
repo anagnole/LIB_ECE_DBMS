@@ -57,9 +57,6 @@ def deleteTeacher(username):
             abort(500) 
 
 @teacher.route("/teacher/profile/<string:username>", methods=['GET', 'POST'])
-def getTeacherProfile(username): 
-
-@teacher.route("/teacher/profile/<string:username>", methods=['GET', 'POST'])
 def getTeacherProfile(username):
 
     form = TeacherForm()
