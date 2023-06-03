@@ -10,23 +10,25 @@ from dbUI.book import book
 def getStudent(username):
     try:
         cur = db.connection.cursor()
-        query = "SELECT b.title, bo.b_date FROM borrows bo INNER JOIN book b ON b.ISBN = bo.ISBN WHERE bo.username = '{}' AND bo.ret_date IS NULL;".format(username)
+        query = "SELECT b.ISBN, b.title, bo.b_date FROM borrows bo INNER JOIN book b ON b.ISBN = bo.ISBN WHERE bo.username = '{}' AND bo.ret_date IS NULL;".format(username)
         cur.execute(query)
         column_names = [i[0] for i in cur.description]
         borrows = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
-        query = "SELECT b.title, r.r_date FROM reserves r INNER JOIN book b ON b.ISBN = r.ISBN WHERE r.username = '{}';".format(username)
+        query = "SELECT b.ISBN, b.title, r.r_date FROM reserves r INNER JOIN book b ON b.ISBN = r.ISBN WHERE r.username = '{}';".format(username)
         cur.execute(query)
         column_names = [i[0] for i in cur.description]
         reserves = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
         query = ("SELECT Library_card FROM approves_user WHERE username = '{}';".format(username))
         cur.execute(query)
         result = cur.fetchone()
+
         if result is not None:
             library_card = result[0]
             has = 1 if library_card == 1 else 0
         else:
             has = 0
         cur.close()
+
         return render_template("student.html", borrows = borrows, username = username, reserves = reserves, has=has, pageTitle = "Student Page")
     except Exception as e:
         abort(500)    
