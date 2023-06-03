@@ -1,0 +1,19 @@
+{% extends "global_layout.html" %}
+{% block content %}
+<div class="container">
+    <head>
+        <title>Admin Page</title>
+    </head>
+    <div>
+        <h1>Welcome to the Admin Page</h1>
+
+        <div class="button-container">
+            <button id="asteacher" onclick = "window.location.href= '/admin/operator'">Insert School</button>
+            <button id="updatebook" onclick = "window.location.href= '/admin/statistics'">View Statistics</button>
+            <button id="insertbook" onclick = "window.location.href= '/operator/{{ username }}/insertbook'">Back up</button>
+        </div>
+    </div>
+    
+    
+</div>
+{% endblock content %}

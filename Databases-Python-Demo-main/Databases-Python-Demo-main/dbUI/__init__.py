@@ -9,6 +9,7 @@ from dbUI.operator import operator
 from dbUI.book import book
 from dbUI.bookinfo import bookinfo
 from dbUI.reviews import review
+from dbUI.admin import admin
 
 ## __name__ is the name of the module. When running directly from python, it will be 'dbdemo'
 ## Outside of this module, as in run.py, it is '__main__' by default
@@ -35,6 +36,7 @@ from dbUI.signup import routes
 from dbUI.student import routes
 from dbUI.teacher import routes
 from dbUI.operator import routes
+from dbUI.admin import routes
 from dbUI.book import routes
 from dbUI.bookinfo import routes
 ##from dbUI.reviews import routes
@@ -46,3 +48,4 @@ app.register_blueprint(book)
 app.register_blueprint(bookinfo)
 app.register_blueprint(review)
 app.register_blueprint(operator)
+app.register_blueprint(admin)

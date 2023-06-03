@@ -1,0 +1,182 @@
+{% extends "global_layout.html" %}
+{% block content %}
+<div class="container">
+    <head>
+        <title>Admin Page</title>
+        
+    </head>
+    <div>
+        <h1>Welcome to the Admin Page</h1>
+
+        <div class="table-responsive">
+            <form action="/admin/statistics" method="POST">
+                {{ form.hidden_tag() }}
+                Choose Month
+                {{form.month}}
+            
+                Choose Year
+                {{form.year}}
+                <div>
+                    {{form.search}}
+                </div>
+            </form> 
+            <table id="school_borrows" class="table">
+                <thead>
+                  <tr>
+                      <th>School Name</th>
+                      <th>Total Borrows</th>
+                      <th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for school in schools %}
+                      <tr>
+                          <td> {{ school.s_name }} </td>
+                          <td> {{ school.total }} </td>
+                      </tr>
+                  {% endfor %}
+              </tbody>
+            </table>
+        </div>
+    </div>
+    <form action="/admin/statistics" method="POST">
+        {{ form2.hidden_tag() }}
+        Pick a Category
+        {{form2.category}}
+        <div>
+            {{form2.search}}
+        </div>
+    </form> 
+    <div class="table-responsive">
+        <table id="authors" class="table">
+            <thead>
+              <tr>
+                  <th>Author Name</th>
+                  <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for author in authors %}
+                  <tr>
+                      <td> {{ author.Ath_full_name }} </td>
+                  </tr>
+              {% endfor %}
+          </tbody>
+        </table>
+        <table id="teachers" class="table">
+            <thead>
+              <tr>
+                  <th>Teacher First Name</th>
+                  <th>Teacher Last Name</th>
+                  <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for teacher in teachers %}
+                  <tr>
+                      <td> {{ teacher.teacher_first_name }} </td>
+                      <td> {{ teacher.teacher_last_name }} </td>
+                  </tr>
+              {% endfor %}
+          </tbody>
+        </table>
+    </div>
+    <div class="table-responsive">
+        <table id="young_teachers" class="table">
+            <thead>
+              <tr>
+                  <th>Teacher First Name</th>
+                  <th>Teacher Last Name</th>
+                  <th>Total Books</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for teacher in young_teachers %}
+                  <tr>
+                      <td> {{ teacher.teacher_first_name }} </td>
+                      <td> {{ teacher.teacher_last_name }} </td>
+                      <td> {{ teacher.total }} </td>
+                  </tr>
+              {% endfor %}
+          </tbody>
+        </table>
+    </div>
+    <div class="table-responsive">
+        <table id="authors_no" class="table">
+            <thead>
+              <tr>
+                  <th>Author Name</th>
+                  <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for author in authors_no %}
+                  <tr>
+                      <td> {{ author.Ath_full_name }} </td>
+                  </tr>
+              {% endfor %}
+          </tbody>
+        </table>
+    </div>
+    <div class="table-responsive">
+        <table id="operators" class="table">
+            <thead>
+              <tr>
+                  <th>Operator 1 First Name</th>
+                  <th>Operator 1 Last Name</th>
+                  <th>Operator 2 First Name</th>
+                  <th>Operator 2 Last Name</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for operator in operators %}
+                  <tr>
+                      <td> {{ operator.o1firstname }} </td>
+                      <td> {{ operator.o1lastname }} </td>
+                      <td> {{ operator.o2firstname }} </td>
+                      <td> {{ operator.o2lastname }} </td>
+                  </tr>
+              {% endfor %}
+          </tbody>
+        </table>
+    </div>
+    <div class="table-responsive">
+        <table id="categories" class="table">
+            <thead>
+              <tr>
+                  <th>1st Category</th>
+                  <th>2nd Category</th>
+                  <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for category in categories %}
+                  <tr>
+                      <td> {{ category.category1 }} </td>
+                      <td> {{ category.category2 }} </td>
+                  </tr>
+              {% endfor %}
+          </tbody>
+        </table>
+    </div>
+    <div class="table-responsive">
+        <table id="authors_5" class="table">
+            <thead>
+              <tr>
+                  <th>Author Name</th>
+                  <th></th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for author in author_5 %}
+                  <tr>
+                      <td> {{ author.Ath_full_name }} </td>
+                  </tr>
+              {% endfor %}
+          </tbody>
+        </table>
+    </div>
+</div>
+    
+</div>
+{% endblock content %}

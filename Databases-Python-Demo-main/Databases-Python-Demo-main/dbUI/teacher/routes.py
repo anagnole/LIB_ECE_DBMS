@@ -55,7 +55,6 @@ def deleteTeacher(username):
         except Exception as e:
             abort(500) 
 
-
 @teacher.route("/teacher/profile/<string:username>", methods=['GET', 'POST'])
 def getTeacherProfile(username):
 

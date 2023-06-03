@@ -35,7 +35,12 @@ INNER JOIN borrows br ON br.ISBN = b.ISBN);
 -- 3.1.5.Ποιοι χειριστές έχουν δανείσει τον ίδιο αριθμό βιβλίων σε διάστημα ενός έτους με περισσότερους από 20 δανεισμούς;
     
     -- Και εδώ με χρήση του view βρίσκουμε ποιοι Operators έχουν ίσους δανεισμούς.
-SELECT o.operator_ID AS operator1_ID, p.operator_ID AS operator2_ID
+SELECT o.Operator_first_name AS o1firstname,
+o.Operator_last_name AS o1lastname,
+ p.Operator_first_name AS o2firstname,
+ p.Operator_last_name AS o2lastname,
+ o.operator_ID AS operator1_ID, 
+p.operator_ID AS operator2_ID
 FROM operatorcounts o
 JOIN operatorcounts p ON o.count_of_books = p.count_of_books AND o.operator_ID < p.operator_ID;
 

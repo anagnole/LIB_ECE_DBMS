@@ -160,7 +160,7 @@ CREATE TABLE Borrows(
 
     -- Εδώ βλέπουμε πόσα βιβλία έχουν δανιστεί χωρισμένα ανά operator. Πχ από τα βιβλία του Operator_1 έχουν δανειστεί τα 6. 
 CREATE VIEW operatorcounts AS
-SELECT o.operator_ID, count(b.ISBN) AS count_of_books from operator o 
+SELECT o.operator_ID, o.Operator_first_name, o.Operator_last_name, count(b.ISBN) AS count_of_books from operator o 
 INNER JOIN book b ON o.operator_ID=b.operator_ID 
 INNER JOIN borrows br ON br.ISBN = b.ISBN
 WHERE YEAR(br.b_date) = 2023
@@ -345,6 +345,7 @@ INSERT INTO operator (Username, Administrator_ID, School_ID, Operator_first_name
  (SELECT first_name FROM usernameview WHERE username = usernameP), 
  (SELECT last_name FROM usernameview WHERE username = usernameP));
  UPDATE users SET Role_user = 'operator' WHERE username = usernameP;
+ CALL approve_operator(UsernameP);
 END $$
 
 CREATE PROCEDURE approve_operator(
