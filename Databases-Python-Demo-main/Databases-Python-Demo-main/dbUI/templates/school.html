@@ -10,7 +10,7 @@
             {{ form.hidden_tag() }}
 
             <div>
-                {{ form.s_name.label }}
+                School Name
                 {{ form.s_name(class = "form-control", placeholder = "Enter Scool Name", required = False) }}
                 {% if form.s_name.errors %}
                     <ul class="errors">
@@ -22,7 +22,7 @@
             </div>
 
             <div>
-                {{ form.address.label }}
+                Address
                 {{ form.address(class = "form-control", placeholder = "Enter the address", required = False) }}
                 {% if form.address.errors %}
                     <ul class="errors">
@@ -34,7 +34,7 @@
             </div>
 
             <div>
-                {{ form.city.label }}
+                City
                 {{ form.city(class = "form-control", placeholder = "Enter the city", required = False) }}
                 {% if form.city.errors %}
                     <ul class="errors">
@@ -46,8 +46,8 @@
             </div>
 
             <div>
-                {{ form.phone_number.label }}
-                {{ form.phone_number(class = "form-control", placeholder = "Enter the number of pages", required = False) }}
+                Phone Number
+                {{ form.phone_number(class = "form-control", placeholder = "Enter phone number", required = False) }}
                 {% if form.phone_number.errors %}
                     <ul class="errors">
                         {% for error in form.phone_number.errors %}
@@ -58,8 +58,8 @@
             </div>
 
             <div>
-                {{ form.email.label }}
-                {{ form.email(class = "form-control", placeholder = "Enter a brief email", required = False) }}
+                email
+                {{ form.email(class = "form-control", placeholder = "Enter email", required = False) }}
                 {% if form.email.errors %}
                     <ul class="errors">
                         {% for error in form.email.errors %}
@@ -70,8 +70,8 @@
             </div>
 
             <div>
-                {{ form.p_full_name.label }}
-                {{ form.p_full_name(class = "form-control", placeholder = "Enter how many copies you can provide", required = False) }}
+                Principle Name
+                {{ form.p_full_name(class = "form-control", placeholder = "Enter Name", required = False) }}
                 {% if form.p_full_name.errors %}
                     <ul class="errors">
                         {% for error in form.p_full_name.errors %}

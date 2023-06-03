@@ -10,7 +10,10 @@
         <div class="button-container">
             <button id="asteacher" onclick = "window.location.href= '/admin/operator'">Insert School</button>
             <button id="updatebook" onclick = "window.location.href= '/admin/statistics'">View Statistics</button>
-            <button id="insertbook" onclick = "window.location.href= '/operator/{{ username }}/insertbook'">Back up</button>
+            <form method="POST">
+                <button name ="action" value ="backup" onclick = "window.location.href= '/admin'">Back up</button>
+                <button name ="action" value ="restore" onclick = "window.location.href= '/admin'">Restore</button>
+            </form>
         </div>
     </div>
     

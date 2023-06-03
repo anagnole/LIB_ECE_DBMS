@@ -2,16 +2,10 @@
 {% block content %}
 <div class="container">
     <head>
-        <title>Books</title>
+        <title>Update Books</title>
     </head>
     <div class="button-container">
-        <h1>Borrow a Book!</h1>
-        <h2>Find your next favorite page-turner here:</h2>
-        
-        <form action="/book/{{ username }}" method="GET">
-            <input type="text" name="search" placeholder="Search for a book">
-            <button type="submit">Search</button>
-        </form>
+        <h1>Update a Book</h1>
 
         {% if books|length == 0 %}
             <h2 style="margin-top: 5rem;">No books found!</h1>
@@ -28,7 +22,7 @@
             <tbody>
               {% for book in books %}
                   <tr>
-                        <td><a class="button" onclick="window.location.href='/bookinfo/{{ username }}/{{ book.ISBN }}'">{{ book.title }}</a></td>
+                        <td><a class="button" onclick="window.location.href='/update_book_info/{{ book.ISBN }}'">{{ book.title }}</a></td>
                         <td> {{ book.available_copies }} </td>
                   </tr>
               {% endfor %}

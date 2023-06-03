@@ -1,0 +1,78 @@
+{% extends "global_layout.html" %}
+{% block content %}
+<div class="container">
+    <head>
+        <title>Update Book Info</title>
+    </head>
+    <div>
+        <h1>Find out more information about:</h1>
+        <form method="POST">
+            {{ form.hidden_tag() }}
+
+            <div class="table-responsive"></div>
+            <table id="bookinfo" class="table">
+                <tbody>
+                    {% for book in books %}
+                    <tr>
+                        <th>Book Title</th>
+                        <td> {{ book.title }} </td>
+                        <td>{{ form.Title( class="form-control", value=book.title)}}</td>
+                    </tr>
+                    <tr>
+                        <th>Author(s)</th>
+                        <td> {{ book.authors }} </td>
+                        <td> {{ form.Authors( class="form-control", value=book.authors)}} </td>
+                    </tr>
+                    <tr>
+                        <th>Publisher</th>
+                        <td> {{ book.publisher }} </td>
+                        <td> {{ form.Publisher( class="form-control", value=book.publisher)}} </td>
+                    </tr>
+                    <tr>
+                        <th>Category</th>
+                        <td> {{ book.categories }} </td>
+                        <td>
+                            <div class="checkbox-group">
+                                {% for category in form.Category %}
+                                    <div class="checkbox">
+                                        <input type="checkbox" id="{{ category.id }}" name="{{ category.name }}" value="{{ category._value() }}">
+                                        <label for="{{ category.id }}">{{ category.label.text }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <th>Number of pages</th>
+                        <td> {{ book.page_number }} </td>
+                        <td> {{ form.Page_number ( class="form-control", value=book.page_number)}} </td>
+                    </tr>
+                    <tr>
+                        <th>Available Copies</th>
+                        <td> {{ book.available_copies }} </td>
+                        <td> {{ form.Available_copies ( class="form-control", value=book.available_copies)}} </td>
+                    </tr>
+                    <tr>
+                        <th>Summary</th>
+                        <td> {{ book.summary }} </td>
+                        <td> {{ form.Summary( class="form-control", value=book.summary)}} </td>
+                    </tr>
+                    <tr>
+                        <th>Key Words</th>
+                        <td> {{ book.keywords }} </td>
+                        <td> {{ form.Key_words( class="form-control", value=book.keywords)}} </td>
+                    </tr>
+                    <tr>
+                        <th>Language</th>
+                        <td> {{ book.b_language }} </td>
+                        <td> {{ form.B_language( class="form-control", value=book.b_language)}} </td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>                    
+            </div>
+            {{form.submit}}
+        </form>
+    </div>
+</div>
+{% endblock content %}
