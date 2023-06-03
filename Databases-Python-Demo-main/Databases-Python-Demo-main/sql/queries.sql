@@ -74,13 +74,6 @@ INNER JOIN written_by w ON w.ISBN = b.ISBN
 INNER JOIN authors a ON a.author_ID = w.author_ID
 WHERE b.title LIKE "%mock%";
 
-SELECT b.title, a.Ath_full_name, c.c_name FROM book b 
-INNER JOIN written_by w ON w.ISBN = b.ISBN 
-INNER JOIN authors a ON a.author_ID = w.author_ID
-INNER JOIN belongs_to be ON be.ISBN = b.ISBN
-INNER JOIN category c ON be.c_name = c.c_name 
-WHERE c.c_name LIKE "%...%";
-
 SELECT b.title, a.Ath_full_name FROM book b 
 INNER JOIN written_by w ON w.ISBN = b.ISBN 
 INNER JOIN authors a ON a.author_ID = w.author_ID
@@ -90,6 +83,16 @@ SELECT b.title, a.Ath_full_name FROM book b
 INNER JOIN written_by w ON w.ISBN = b.ISBN 
 INNER JOIN authors a ON a.author_ID = w.author_ID
 WHERE b.Available_copies = 3;
+
+SELECT b.title, a.Ath_full_name, c.c_name FROM book b 
+INNER JOIN written_by w ON w.ISBN = b.ISBN 
+INNER JOIN authors a ON a.author_ID = w.author_ID
+INNER JOIN belongs_to be ON be.ISBN = b.ISBN
+INNER JOIN category c ON be.c_name = c.c_name 
+WHERE c.c_name LIKE "%thr%"
+AND b.title LIKE "%wind%"
+AND a.Ath_full_name LIKE "%gar%"
+AND b.Available_copies = 5; 
 
 -- 3.2.2.Εύρεση όλων των δανειζόμενων που έχουν στην κατοχή τους τουλάχιστον ένα βιβλίο και έχουν καθυστερήσει την επιστροφή του. 
 -- (Κριτήρια αναζήτησης: Όνομα, Επώνυμο, Ημέρες Καθυστέρησης).

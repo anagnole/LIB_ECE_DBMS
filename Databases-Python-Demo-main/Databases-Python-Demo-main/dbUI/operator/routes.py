@@ -15,9 +15,8 @@ def getOperator(username):
         cur.execute(query)
         column_names = [i[0] for i in cur.description]
         books = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
-        result = cur.fetchone()
-
-        return render_template("operator.html", username = username, pageTitle = "Operator Page")
+        cur.close()
+        return render_template("operator.html", books=books, username = username, pageTitle = "Operator Page")
     except Exception as e:
         abort(500)    
 

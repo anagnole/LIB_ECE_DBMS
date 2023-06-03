@@ -15,26 +15,27 @@
     </div>
     
     {% if books|length == 0 %}
-        <h2 style="margin-top: 5rem;">No books found!</h1>
-    {% else %}
-    <div class="table-responsive"></div>
-    <table id="book" class="table">
-        <thead>
-            <tr>
-                <th>Book Title</th>
-                <th>Book Authors</th>   
-            </tr>
-        </thead>
-        <tbody>
-        {% for book in books %}
-            <tr>
-                <td> {{ book.title }} </td>
+    <h2 style="margin-top: 5rem;">No books found!</h1>
+{% else %}
+<div class="table-responsive"></div>
+<table id="book" class="table">
+    <thead>
+      <tr>
+          <th>Book Title</th>
+          <th>Authors</th>
+          <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for book in books %}
+          <tr>
+                <td>{{ book.title }}</a></td>
                 <td> {{ book.authors }} </td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
-    {%endif%}
+          </tr>
+      {% endfor %}
+  </tbody>
+  </table>
+{%endif%}
 
     {% if latereturns|length == 0 %}
         <h2 style="margin-top: 5rem;">No late returns found!</h1>
