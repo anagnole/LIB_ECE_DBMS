@@ -1421,5 +1421,4 @@ INSERT INTO borrows (Username, ISBN, b_date, ret_date) VALUES
 
 
 INSERT INTO reserves (Username, ISBN, r_date) VALUES 
-('user35', 978000002, '2023-06-04'),
-('user35', 978000040, '2023-06-05');
+('user35', 978000002, '2023-06-04');
