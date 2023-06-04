@@ -1,3 +1,201 @@
+-- Triggers
+
+DELIMITER $$
+
+CREATE TRIGGER initialsub 
+BEFORE INSERT ON borrows
+FOR EACH ROW
+BEGIN
+  IF NEW.ret_date IS NULL
+    THEN UPDATE book SET Available_copies = Available_copies-1 WHERE new.isbn = isbn;
+  END IF;
+END $$
+
+CREATE TRIGGER reviewtrig 
+BEFORE INSERT ON Reviews
+FOR EACH ROW
+BEGIN
+  IF (SELECT Library_card FROM approves_user WHERE new.username = username) = 0
+    THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sorry, You do not have a library card.';
+  END IF;
+END $$
+
+CREATE PROCEDURE insertuser(
+  IN USERNAMEP VARCHAR(45),
+  IN U_passwordP INT,
+  IN Role_userP VARCHAR(45),
+  IN First_name VARCHAR(45),
+  IN Last_name VARCHAR(45),
+  IN AgeP INT
+)
+BEGIN
+  INSERT INTO USERS (USERNAME, U_password, Role_user) VALUES (USERNAMEP, U_passwordP, Role_userP);
+  IF Role_userP = 'student' THEN
+    INSERT INTO Student_user(USERNAME, Student_first_name, Student_last_name) VALUES (UsernameP, first_name, last_name);
+    INSERT INTO approves_user (username, operator_ID, Library_card) VALUES (usernameP, 1, 0);
+  END IF;
+  IF Role_userP = 'teacher' THEN
+    INSERT INTO Teacher_user(USERNAME, Teacher_first_name, Teacher_last_name, Age) VALUES (UsernameP, first_name, last_name, AgeP);
+    INSERT INTO approves_user (username, operator_ID, Library_card) VALUES (usernameP, 1, 0);
+  END IF;
+END $$
+
+CREATE PROCEDURE new_borrow(
+  IN NEWISBN INT,
+  IN NEWusername VARCHAR(45),
+  IN NEWB_DATE DATE
+)
+BEGIN
+IF (SELECT Library_card FROM approves_user WHERE Newusername = username) = 0
+    THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sorry, You do not have a library card.';
+  END IF;
+IF EXISTS (SELECT 1 FROM book WHERE Available_copies = 0 AND ISBN = NEWISBN) THEN 
+ IF (((SELECT Role_user FROM users WHERE username = NEWusername) = 'teacher' or ((SELECT Role_user FROM users WHERE username = NEWusername) = 'operator'))
+    AND (((select count(*) from ((select isbn from reserves where username = NEWUsername) union (select isbn from borrows where username = NEWUsername and ret_date IS NULL)) as awrFg) = 2)
+    OR ((SELECT DATEDIFF(current_timestamp, r_date) FROM reserves WHERE username = NEWusername LIMIT 1) < 7) 
+    OR ((SELECT DATEDIFF(current_timestamp, b_date) FROM borrows WHERE username = NEWusername LIMIT 1) < 7)) )
+      THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sorry, Teacher-user cannot reserve more than 1 book per week at the same time.';
+  END IF;
+  IF (((SELECT Role_user FROM users WHERE username = NEWusername) = 'student') 
+    AND (((SELECT count(*) FROM ((select isbn from reserves where username = NEWUsername) union (select isbn from borrows where username = NEWUsername and ret_date IS NULL)) as wrFg) = 4) 
+    OR (SELECT count(*) FROM ((SELECT isbn FROM borrows WHERE username = NEWusername AND DATEDIFF(current_timestamp, b_date) < 7)
+    union (SELECT isbn FROM reserves WHERE username = NEWusername AND DATEDIFF(current_timestamp, r_date) < 7)) AS omit) = 2))
+      THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sorry, Student-user cannot reserve more than 2 books per week at the same time.';
+  END IF;
+  INSERT INTO RESERVES (USERNAME, ISBN, R_DATE) VALUES (NEWusername, NEWISBN, NEWB_DATE);
+  
+ELSE 
+  
+  IF (((SELECT Role_user FROM users WHERE username = NEWusername) = 'teacher' or ((SELECT Role_user FROM users WHERE username = NEWusername) = 'operator'))
+    AND (((select count(*) from ((select username from reserves where username = NEWUsername) union (select username from borrows where username = NEWUsername and ret_date IS NULL)) as awrg) = 2)
+    OR ((SELECT DATEDIFF(current_timestamp, b_date) FROM borrows WHERE username = NEWusername LIMIT 1) < 7)
+    OR ((SELECT DATEDIFF(current_timestamp, r_date) FROM reserves WHERE username = NEWusername LIMIT 1) < 7)) )
+      THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sorry, Teacher-user cannot borrow more than 1 book per week at the same time.';
+  END IF;
+  IF (((SELECT Role_user FROM users WHERE username = NEWusername) = 'student') 
+    AND (((SELECT count(*) FROM ((select username from reserves where username = NEWUsername) union (select username from borrows where username = NEWUsername and ret_date IS NULL)) as wrFg) = 4)
+    OR (SELECT count(*) FROM ((SELECT isbn FROM borrows WHERE username = NEWusername AND DATEDIFF(current_timestamp, b_date) < 7)
+    UNION (SELECT isbn FROM reserves WHERE username = NEWusername AND DATEDIFF(current_timestamp, r_date) < 7)) AS tabl) = 2))
+      THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sorry, Student-user cannot borrow more than 2 books per week at the same time.';
+  END IF;
+  IF EXISTS (SELECT 1 FROM BORROWS WHERE username=NEWusername AND DATEDIFF(current_timestamp, b_date)>14 AND ret_date IS NULL)
+    THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sorry, Your return limit has expired.';
+  END IF;
+  INSERT INTO BORROWS (USERNAME, ISBN, B_DATE) VALUES (NEWusername, NEWISBN, NEWB_DATE);
+END IF;
+END $$
+
+CREATE PROCEDURE update_copies(
+  IN isbn1 INT
+  )
+BEGIN
+UPDATE book SET Available_copies = Available_copies + 1 WHERE isbn = isbn1;
+  IF ((SELECT Available_copies FROM book where isbn1 = isbn ) = 1 AND EXISTS (SELECT 1 FROM reserves WHERE isbn1 = isbn)) THEN
+    UPDATE reserves SET r_date = '2023-5-5' WHERE isbn = isbn1 and username = (SELECT username FROM reserves WHERE isbn = isbn1 ORDER BY r_date LIMIT 1);
+    CALL new_borrow(isbn1, (SELECT username FROM reserves WHERE isbn = isbn1 ORDER BY r_date LIMIT 1), current_timestamp);
+    DELETE FROM reserves WHERE isbn = isbn1 AND Username = (SELECT username FROM reserves WHERE isbn = isbn1);  
+  END IF;
+END $$
+
+CREATE PROCEDURE add_copies(
+  IN isbn1 INT,
+  IN Username1 VARCHAR(45)
+  )
+BEGIN
+UPDATE borrows SET ret_date = current_timestamp WHERE ISBN = isbn1 AND username = Username1; 
+UPDATE book SET Available_copies = Available_copies+1 WHERE isbn = isbn1;
+  IF ((SELECT Available_copies FROM book where isbn1 = isbn ) = 1 AND EXISTS (SELECT 1 FROM reserves WHERE isbn1 = isbn)) THEN
+    UPDATE reserves SET r_date = '2023-5-5' WHERE isbn = isbn1 and username = (SELECT username FROM reserves WHERE isbn = isbn1 ORDER BY r_date LIMIT 1);
+    CALL new_borrow(isbn1, (SELECT username FROM reserves WHERE isbn = isbn1 ORDER BY r_date LIMIT 1), current_timestamp);
+    DELETE FROM reserves WHERE isbn = isbn1 AND Username = (SELECT username FROM reserves WHERE isbn = isbn1);  
+  END IF;
+END $$
+
+CREATE PROCEDURE check_for_reserves(
+  IN isbn1 INT
+)
+BEGIN
+  IF ((SELECT Available_copies FROM book where isbn1 = isbn ) = 1 AND EXISTS (SELECT 1 FROM reserves WHERE isbn1 = isbn)) THEN
+    CALL new_borrow(isbn1, (SELECT username FROM reserves WHERE isbn = isbn1 ORDER BY r_date LIMIT 1), current_timestamp);
+    DELETE FROM reserves WHERE isbn = isbn1 AND Username = (SELECT username FROM reserves WHERE isbn = isbn1);  
+  END IF;
+END $$
+
+CREATE PROCEDURE delete_user(
+  IN Username1 VARCHAR(45)
+)
+BEGIN
+  myloop: LOOP    
+    IF ((SELECT count(*) FROM borrows WHERE username = Username1 AND ret_date IS NULL) = 0)
+     THEN
+      LEAVE myloop;
+    END IF;
+    CALL add_copies(
+      (SELECT b.isbn from book b INNER JOIN borrows bo ON b.ISBN = bo.ISBN WHERE bo.username = Username1 and bo.ret_date IS NULL LIMIT 1),
+      Username1
+      );
+  END LOOP myloop;
+DELETE FROM users WHERE username = Username1;
+END $$
+
+CREATE PROCEDURE add_school(
+  IN S_NameP VARCHAR(45),
+  IN AdressP VARCHAR(45),
+  IN CityP VARCHAR(45),
+  IN Phone_numberP INT,
+  IN EmailP VARCHAR(45),
+  IN P_full_nameP VARCHAR(45),
+  IN UsernameP VARCHAR(45))
+BEGIN
+INSERT INTO School (S_Name, Adress, City, Phone_number, Email, P_full_name) VALUES (S_NameP, AdressP, CityP, Phone_numberP, EmailP, P_full_nameP);
+INSERT INTO operator (Username, Administrator_ID, School_ID, Operator_first_name, Operator_last_name) VALUES
+ (UsernameP, 
+  NULL,
+ (SELECT School_ID FROM School WHERE S_name = S_nameP),
+ (SELECT first_name FROM usernameview WHERE username = usernameP), 
+ (SELECT last_name FROM usernameview WHERE username = usernameP));
+ UPDATE users SET Role_user = 'operator' WHERE username = usernameP;
+ CALL approve_operator(UsernameP);
+END $$
+
+CREATE PROCEDURE approve_operator(
+  IN UsernamePO VARCHAR(45))
+BEGIN
+UPDATE operator SET Administrator_ID = 1 WHERE username = usernamePO;
+END $$ 
+
+CREATE PROCEDURE Library_card_approval(
+  IN UsernamePU VARCHAR(45),
+  IN UsernamePO VARCHAR(45))
+BEGIN
+UPDATE approves_user SET Library_card = 1, operator_ID = UsernamePO WHERE username = UsernamePU;
+END $$ 
+
+CREATE PROCEDURE pick_author(
+  IN ISBNP INT,
+  IN Ath_full_nameP VARCHAR(45)
+)
+BEGIN
+IF NOT EXISTS (SELECT 1 FROM authors where Ath_full_name = Ath_full_nameP)
+THEN INSERT INTO Authors(Ath_full_name) VALUES (Ath_full_nameP);
+END IF;
+INSERT INTO written_by (ISBN, Author_ID) VALUES (ISBNP, (SELECT Author_ID FROM Authors WHERE Ath_full_name = Ath_full_nameP));
+END $$
+
+CREATE PROCEDURE check_reserves()
+BEGIN
+DELETE FROM reserves WHERE DATEDIFF(current_timestamp, r_date) > 7;
+END $$
+
+CREATE PROCEDURE approve_reviews(
+  IN UsernameP VARCHAR(45),
+  IN ISBNP INT)
+BEGIN
+UPDATE Reviews SET Needs_approval = 0 WHERE username = usernameP AND ISBN = ISBNP;
+END $$ 
+
+DELIMITER ;
+
 -- Insert 10 rows into School table
 INSERT INTO School (S_Name, Adress, City, Phone_number, Email, P_full_name)
 VALUES
@@ -261,6 +459,16 @@ INSERT INTO Approves_user (Username, Operator_ID, Library_card) VALUES
 ('user28', 10, True),
 ('user29', 2, True),
 ('user30', 2, True),
+('user31', 2, True),
+('user32', 1, True),
+('user33', 2, True),
+('user34', 2, True),
+('user35', 2, True),
+('user36', 2, True),
+('user37', 2, True),
+('user38', 2, True),
+('user39', 2, True),
+('user40', 2, True),
 ('user41', 3, True),
 ('user42', 8, True),
 ('user43', 4, True),
@@ -284,36 +492,36 @@ INSERT INTO Approves_user (Username, Operator_ID, Library_card) VALUES
 
 INSERT INTO Book (ISBN, Title, Publisher, Page_number, Summary, Available_copies, img, B_language, Operator_ID)
 VALUES 
-  (978000001, 'The Gt Gatsby', 'Scribner', 180, 'A story of the decadent excesses of the Roaring Twenties', 5, 'https://example.com/book_1.jpg', 'English', 1),
-  (978000002, 'To Kill a Mockingbird 2', 'J. B. Lippincott & Co.', 324, 'A novel set in the Depression-era Deep South and dealing with themes of racial inequality', 1, 'https://example.com/book_2.jpg', 'English', 2),
-  (978000003, 'One Hundred Years of Solitude', 'Harper & Row', 417, 'A landmark novel of the Latin American Boom that tells the story of the Buendía family over seven generations', 2, 'https://example.com/book_3.jpg', 'Spanish', 3),
-  (978000004, 'Stranger', 'Gallimard', 123, 'A novel by French author Albert Camus that explores themes of alienation and absurdity',5, 'https://example.com/book_4.jpg', 'French', 4),
+  (978000001, 'Maestro', 'Scribner', 180, 'Forbitten romances, dark secrets and a murder take place at a breathtaking island. Sea, sun, familly, love : all in one story!! ', 5, 'https://example.com/book_1.jpg', 'English', 1),
+  (978000002, 'Superman', 'J. B. Lippincott & Co.', 324, ' Our beloved hero of all times in new adventures.', 1, 'https://example.com/book_2.jpg', 'English', 2),
+  (978000003, 'Happy Hippo', 'Harper & Row', 417, 'A hippo who can talk becomes the best friend of a little boy named Billy, and at the same time our favorite company.', 2, 'https://example.com/book_3.jpg', 'Spanish', 3),
+  (978000004, 'Stranger', 'Gallimard', 123, 'A novel that explores themes of alienation and absurdity',5, 'https://example.com/book_4.jpg', 'French', 4),
   (978000005, 'The Wind-Up Bird Chronicle', 'Shinchosha', 607, 'A novel by Greek author Haruki Murakami that blends elements of magical realism with historical fiction', 4, 'https://example.com/book_5.jpg', 'Greek', 5),
   (978000006, 'The Name of the Rose', 'Adelphi Edizioni', 536, 'A historical murder mystery set in an Italian monastery in the year 1327', 6, 'https://example.com/book_6.jpg', 'Italian', 6),
   (978000007, 'The Hitchhiker"s Guide to the Galaxy', 'Pan Books', 193, 'A science fiction comedy that follows the misadventures of an unwitting human and his alien friend as they travel through space', 3, 'https://example.com/book_7.jpg', 'English', 7),
   (978000008, 'Chronicle of a Death Foretold', 'La Oveja Negra', 120, 'A novella by Colombian author Gabriel García Márquez that explores the events leading up to a murder', 2, 'https://example.com/book_8.jpg', 'Spanish', 8),
-  (978000009, 'The ial', 'Kurt Wolff Verlag', 255, 'A novel by Franz Kafka that tells the story of a man who is arrested and put on trial, but is never told what crime he has committed', 1, 'https://example.com/book_9.jpg', 'German', 9),
+  (978000009, 'Batman', 'Kurt Wolff Verlag', 255, 'A comic that all familly will enjoy. Batman vs the most notorious villain.', 1, 'https://example.com/book_9.jpg', 'German', 9),
   (978000010, 'The Sound and the Fury', 'Jonathan Cape and Harrison Smith', 326, 'A novel by William Faulkner that employs a stream-of-consciousness narrative style to tell the story of the Compson family over several decades', 4, 'https://example.com/book_10.jpg', 'English', 10),
-  (978000011, 'Crime and Punishment 2', 'The Russian Messenger', 430, 'A novel by Fyodor Dostoevsky that follows the moral dilemmas and consequences of a young man who commits a murder', 5, 'https://example.com/book_11.jpg', 'Russian', 1),
+  (978000011, 'Romeo and Juliet', 'The Russian Messenger', 430, 'The classical romance of all times. ', 5, 'https://example.com/book_11.jpg', 'Russian', 1),
   (978000012, '1984', 'Secker & Warburg', 328, 'A dystopian novel by George Orwell that depicts a totalitarian society and explores themes of government control and surveillance', 4, 'https://example.com/book_22.jpg', 'English' ,2),
   (978000013, 'The Lord of the Rings', 'George Allen & Unwin', 1178, 'A high fantasy novel by J.R.R. Tolkien that follows the quest to destroy the One Ring and defeat the Dark Lord Sauron', 3, 'https://example.com/book_23.jpg', 'English', 3),
-  (978000014, 'The Alchemist 2', 'HarperCollins', 197, 'A novel by Paulo Coelho that tells the story of a young Andalusian shepherd on a journey to find his personal legend', 6, 'https://example.com/book_24.jpg', 'Portuguese', 4),
+  (978000014, 'Spiderman', 'HarperCollins', 197, 'An unforgettable comic with our favourite spider boy saving the world.', 6, 'https://example.com/book_24.jpg', 'Portuguese', 4),
   (978000015, 'The Littlebig Prince', 'Reynal & Hitchcock', 96, 'A novella by Antoine de Saint-Exupéry that tells the story of a young prince who travels from planet to planet, learning important life lessons along the way', 5, 'https://example.com/book_25.jpg', 'French', 5),
   (978000016, 'The Adventures of Tom Sawyer', 'Chatto & Windus', 274, 'A novel by Mark Twain that follows the adventures of a young boy named Tom Sawyer in the Mississippi River town of St. Petersburg', 7, 'https://example.com/book_26.jpg', 'English', 6),
-  (978000017, 'Moby-Dick 2', 'Richard Bentley', 585, 'A novel by Herman Melville that tells the story of Captain Ahab"s obsessive quest for revenge against the white whale, Moby Dick', 2, 'https://example.com/book_27.jpg', 'English', 7),
+  (978000017, 'Maria Antoinette', 'Richard Bentley', 585, 'The story of the french queen!', 2, 'https://example.com/book_27.jpg', 'English', 7),
   (978000018, 'The Count of Monte Cristopher', 'Pétion', 464, 'A novel by Alexandre Dumas that follows the story of Edmond Dantès, who seeks revenge against those who wrongly imprisoned him', 4, 'https://example.com/book_28.jpg', 'French', 8),
-  (978000019, 'Frankenstein 2', 'Lackington, Hughes, Harding, Mavor & Jones', 280, 'A novel by Mary Shelley that tells the story of Victor Frankenstein and his creation, often referred to as the Frankenstein monster', 3, 'https://example.com/book_29.jpg', 'English', 9),
+  (978000019, 'Travel with Mamalakis', 'Lackington, Hughes, Harding, Mavor & Jones', 280, 'Travel around Greece and learn hoe to cook delicious plates.', 3, 'https://example.com/book_29.jpg', 'English', 9),
   (978000020, 'The Great Expectations', 'Chapman & Hall', 505, 'A novel by Charles Dickens that follows the life of Pip, an orphan who rises through society and faces various challenges along the way', 6, 'https://example.com/book_30.jpg', 'English', 10),
   (978000021, 'The Kite', 'Riverhead Books', 371, 'A novel by Khaled Hosseini that follows the story of Amir, a young boy from Afghanistan, and his journey of redemption', 5, 'https://example.com/book_31.jpg', 'English', 1),
-  (978000022, 'The fChronicles o Narnia', 'Geoffrey Bles', 767, 'A series of fantasy novels by C.S. Lewis that takes readers to the magical world of Narnia and follows the adventures of various characters', 3, 'https://example.com/book_32.jpg', 'English', 2),
+  (978000022, 'World War Two', 'Geoffrey Bles', 767, 'A historical book that sets light to these dark times in the history of humanity.', 3, 'https://example.com/book_32.jpg', 'English', 2),
   (978000023, 'The Picture Book', 'Random House', 40, 'A children"s picture book that engages young readers with colorful illustrations and simple storytelling', 8, 'https://example.com/book_33.jpg', 'English' ,3),
   (978000024, 'The Girl with the Dragon Tattoo', 'Norstedts Förlag', 672, 'A psychological thriller novel by Stieg Larsson that follows investigative journalist Mikael Blomkvist and computer hacker Lisbeth Salander', 4, 'https://example.com/book_34.jpg', 'Swedish', 4),
   (978000025, 'Hobbit', 'George Allen & Unwin', 310, 'A children"s fantasy novel by J.R.R. Tolkien that follows the adventures of hobbit Bilbo Baggins as he embarks on a quest to reclaim a treasure from a dragon', 6, 'https://example.com/book_35.jpg', 'English', 5),
   (978000026, 'Harry Potter and the Philosopher"s Stone', 'Bloomsbury Publishing', 223, 'The first book in the Harry Potter series by J.K. Rowling, introducing the young wizard and his journey at Hogwarts School of Witchcraft and Wizardry', 7, 'https://example.com/book_36.jpg', 'English', 6),
   (978000027, 'The Hunger Games', 'Scholastic Corporation', 374, 'The first book in the dystopian trilogy by Suzanne Collins, where teenagers are forced to participate in a televised battle to the death', 5, 'https://example.com/book_37.jpg', 'English', 7),
-  (978000028, 'The Vinci Code', 'Doubleday', 454, 'A mystery thriller novel by Dan Brown that follows symbologist Robert Langdon as he unravels a series of clues related to a hidden secret society', 3, 'https://example.com/book_38.jpg', 'English', 8),
+  (978000028, 'Alexander the Great', 'Doubleday', 454, 'A historical novel for the ancient Alexander the Great of Macedonia', 3, 'https://example.com/book_38.jpg', 'English', 8),
   (978000029, 'The Fault in Our Stars', 'Dutton Books', 313, 'A young adult novel by John Green that tells the love story of Hazel and Gus, two teenagers with cancer', 6, 'https://example.com/book_39.jpg', 'English', 9),
-  (978000030, 'A Game of Thrones', 'Bantam Spectra', 694, 'The first book in the fantasy series A Song of Ice and Fire by George R.R. Martin, featuring a complex web of political intrigue and power struggles in the fictional land of Westeros', 4, 'https://example.com/book_40.jpg', 'English', 10),
+  (978000030, 'Game of Thrones', 'Bantam Spectra', 694, 'The first book in the fantasy series A Song of Ice and Fire by George R.R. Martin, featuring a complex web of political intrigue and power struggles in the fictional land of Westeros', 4, 'https://example.com/book_40.jpg', 'English', 10),
   (978000031, 'Odyssey', 'Homer', 442, 'An ancient Greek epic poem attributed to Homer, telling the story of Odysseus and his ten-year journey back home to Ithaca after the Trojan War', 5, 'https://example.com/book_31.jpg', 'Greek', 1),
   (978000032, 'The Adventures of Huckleberry Finn', 'Chatto & Windus', 366, 'A novel by Mark Twain that follows the adventures of Huckleberry Finn and his friend Jim, an escaped slave, as they travel along the Mississippi River', 6, 'https://example.com/book_32.jpg', 'English',2 ),
   (978000033, 'Crime and Punishment', 'The Russian Messenger', 430, 'A novel by Fyodor Dostoevsky that explores the psychological turmoil of Raskolnikov, a poor ex-student who commits a murder and grapples with guilt and punishment', 4, 'https://example.com/book_33.jpg', 'Russian', 3),
@@ -323,23 +531,23 @@ VALUES
   (978000037, 'The Canterbury Tales', 'Geoffrey Chaucer', 524, 'A collection of stories by Geoffrey Chaucer, written in Middle English, depicting a group of pilgrims traveling to the shrine of Saint Thomas Becket', 4, 'https://example.com/book_37.jpg', 'Middle English', 7),
   (978000038, 'Wuthering Heights', 'Thomas Cautley Newby', 320, 'A novel by Emily Brontë that explores the passionate and destructive love story of Catherine Earnshaw and Heathcliff on the Yorkshire moors', 6, 'https://example.com/book_38.jpg', 'English', 8),
   (978000039, 'Don Quixote', 'Francisco de Robles', 863, 'A novel by Miguel de Cervantes that follows the adventures of an eccentric nobleman, Alonso Quixano, who imagines himself to be a knight-errant', 3, 'https://example.com/book_39.jpg', 'Spanish' ,9 ),
-  (978000040, 'The Name of the Rose 2', 'Adelphi Edizioni', 536, 'A historical murder mystery set in an Italian monastery in the year 1327', 1, 'https://example.com/book_6.jpg', 'Italian', 1),
+  (978000040, 'The Notebook', 'Adelphi Edizioni', 536, 'A moving love-story picturing that true love never ages.', 1, 'https://example.com/book_6.jpg', 'Italian', 1),
   (978000041, 'The Catcher ', 'Little, Brown and Company', 277, 'A novel by J.D. Salinger that follows the story of Holden Caulfield, a teenager navigating his way through adolescence and society', 5, 'https://example.com/book_41.jpg', 'English', 2),
   (978000042, 'The Thief', 'Markus Zusak', 584, 'A historical fiction novel by Markus Zusak set during World War II, narrated by Death and centered around a young girl named Liesel Meminger', 6, 'https://example.com/book_42.jpg', 'English', 3),
-  (978000043, 'To Mockingbird', 'Harper Lee', 324, 'A novel by Harper Lee that explores racial injustice and moral development through the eyes of a young girl named Scout Finch in the 1930s Deep South', 4, 'https://example.com/book_43.jpg', 'English', 4),
+  (978000043, 'The love of my life', 'Harper Lee', 324, 'A sweet novel of two teens crazy in love who were made to grew up apart.', 4, 'https://example.com/book_43.jpg', 'English', 4),
   (978000044, 'The Shining', 'Doubleday', 447, 'A horror novel by Stephen King that follows the story of Jack Torrance, a writer who becomes the winter caretaker of the isolated Overlook Hotel and descends into madness', 3, 'https://example.com/book_44.jpg', 'English', 5),
   (978000045, 'The Secret Life of Bees', 'Viking Press', 336, 'A novel by Sue Monk Kidd that explores themes of race, family, and female empowerment through the journey of a young girl named Lily Owens in the 1960s American South', 7, 'https://example.com/book_45.jpg', 'English', 6),
   (978000046, 'The Name of the Wind', 'DAW Books', 662, 'The first book in the fantasy series The Kingkiller Chronicle by Patrick Rothfuss, following the story of Kvothe, an orphan with a talent for magic and music', 5, 'https://example.com/book_46.jpg', 'English', 7),
   (978000047, 'The Road', 'Alfred A. Knopf', 287, 'A post-apocalyptic novel by Cormac McCarthy that follows a father and son as they journey across a desolate landscape, facing numerous challenges and moral dilemmas', 4, 'https://example.com/book_47.jpg', 'English', 8),
   (978000048, 'The Diary of a Young Girl', 'Contact Publishing', 283, 'The published diary of Anne Frank, a Jewish girl who went into hiding during the Nazi occupation of the Netherlands and documented her experiences', 6, 'https://example.com/book_48.jpg', 'Dutch', 9),
-  (978000049, 'Brave New World 2', 'Chatto & Windus', 311, 'A dystopian novel by Aldous Huxley that depicts a future society where human reproduction is controlled and citizens are kept in a state of superficial happiness', 3, 'https://example.com/book_49.jpg', 'English', 10),
-  (978000050, 'TheWrath', 'The Viking Press', 464, 'A novel by John Steinbeck that tells the story of the Joads, a poor family of tenant farmers during the Great Depression, as they migrate from Oklahoma to California', 8, 'https://example.com/book_50.jpg', 'English', 1),
+  (978000049, 'Einstein in a parallel universe', 'Chatto & Windus', 311, 'A novel that combines the life of the great scientist with fiction.', 3, 'https://example.com/book_49.jpg', 'English', 10),
+  (978000050, 'The oven of the grandma', 'The Viking Press', 464, 'The best recepies book with traditional greek plates and their history.', 8, 'https://example.com/book_50.jpg', 'English', 1),
   (978000051, 'Pride and Prejudice', 'Thomas Egerton', 279, 'A novel by Jane Austen that follows the story of Elizabeth Bennet and her complex relationship with the proud Mr. Darcy', 5, 'https://example.com/book_51.jpg', 'English',2),
   (978000052, 'Moby-Dick', 'Richard Bentley', 585, 'A novel by Herman Melville that tells the story of Captain Ahab and his relentless pursuit of the great white whale', 6, 'https://example.com/book_52.jpg', 'English',3),
-  (978000053, 'The Great Gatsby 7', 'Charles Scribner"s Sons', 180, 'A novel by F. Scott Fitzgerald set in the Jazz Age, depicting the glamorous and tragic life of Jay Gatsby and his love for Daisy Buchanan', 4, 'https://example.com/book_53.jpg', 'English',4),
+  (978000053, 'A story for a better life', 'Charles Scribner"s Sons', 180, 'An ispiring story that changes the way you see life.', 4, 'https://example.com/book_53.jpg', 'English',4),
   (978000054, 'War and Peace', 'The Russian Messenger', 1225, 'A novel by Leo Tolstoy that explores the impact of war on society through the intertwining lives of various characters during the Napoleonic era', 3, 'https://example.com/book_54.jpg', 'Russian',5),
   (978000055, 'Jane Eyre', 'Smith, Elder & Co.', 594, 'A novel by Charlotte Brontë that follows the life of Jane Eyre, an orphan who becomes a governess and navigates love, independence, and societal expectations', 7, 'https://example.com/book_55.jpg', 'English',6),
-  (978000056, '1982', 'Secker & Warburg', 328, 'A dystopian novel by George Orwell that depicts a totalitarian society governed by Big Brother, where individuality and independent thought are suppressed', 5, 'https://example.com/book_56.jpg', 'English',7),
+  (978000056, 'Ioannis Kapodistrias', 'Secker & Warburg', 328, 'A biography of Ioannis Kapodistrias the first Governor of the new state of Greece.', 5, 'https://example.com/book_56.jpg', 'English',7),
   (978000057, 'The Lord and the Rings', 'George Allen & Unwin', 1178, 'A fantasy novel by J.R.R. Tolkien that follows the quest to destroy the One Ring and the epic battles between the forces of good and evil in the land of Middle-earth', 4, 'https://example.com/book_57.jpg', 'English',8),
   (978000058, 'Anna Karenina', 'The Russian Messenger', 864, 'A novel by Leo Tolstoy that explores themes of love, infidelity, and societal norms through the tragic story of Anna Karenina and her affair with Count Vronsky', 6, 'https://example.com/book_58.jpg', 'Russian',9),
   (978000059, 'The Alchemist', 'Editora Rocco', 208, 'A novel by Paulo Coelho that follows the journey of a young Andalusian shepherd boy named Santiago as he sets out to discover his personal legend', 3, 'https://example.com/book_59.jpg', 'Portuguese',10),
@@ -347,17 +555,17 @@ VALUES
   (978000061, 'The Picture of Dorian Gray', 'Ward, Lock & Co.', 254, 'A novel by Oscar Wilde that tells the story of a young man named Dorian Gray, who remains eternally young while a portrait of him ages and reflects his hidden sins', 5, 'https://example.com/book_61.jpg', 'English',2),
   (978000062, 'The Little Prince', 'Reynal & Hitchcock', 96, 'A novella by Antoine de Saint-Exupéry that follows the story of a young prince who travels from planet to planet and learns valuable life lessons along the way', 6, 'https://example.com/book_62.jpg', 'French',3),
   (978000063, 'The Hobbit', 'George Allen & Unwin', 310, 'A fantasy novel by J.R.R. Tolkien that serves as a prequel to The Lord of the Rings, following the adventures of Bilbo Baggins as he embarks on a quest to reclaim the dwarf kingdom of Erebor', 4, 'https://example.com/book_63.jpg', 'English',4),
-  (978000064, 'Gone with the Wind 2', 'Macmillan Publishers', 1037, 'A novel by Margaret Mitchell set during the American Civil War and Reconstruction era, focusing on the life of Scarlett O"Hara and her love affair with Rhett Butler', 3, 'https://example.com/book_64.jpg', 'English',5),
+  (978000064, 'Philipos in 2023', 'Macmillan Publishers', 1037, 'Philipos of ancient Greece, the father of Alexander the Great today.', 3, 'https://example.com/book_64.jpg', 'English',5),
   (978000065, 'The Kite Runner', 'Riverhead Books', 371, 'A novel by Khaled Hosseini that explores themes of friendship, betrayal, and redemption through the story of Amir, a young boy from Kabul, and his journey to confront his past', 7, 'https://example.com/book_65.jpg', 'English',6),
   (978000066, 'The Odyssey', 'Homer', 442, 'An ancient Greek epic poem attributed to Homer, telling the story of Odysseus and his ten-year journey back home to Ithaca after the Trojan War', 5, 'https://example.com/book_66.jpg', 'Greek',7),
   (978000067, 'Sherlock Holmes', 'George Newnes Ltd', 307, 'A collection of detective stories by Arthur Conan Doyle featuring the iconic character Sherlock Holmes and his loyal companion Dr. John Watson', 4, 'https://example.com/book_67.jpg', 'English',8),
   (978000068, 'The Scarlet Letters', 'Ticknor, Reed & Fields', 238, 'A novel by Nathaniel Hawthorne set in 17th-century Puritan Boston, exploring themes of sin, guilt, and redemption through the story of Hester Prynne', 6, 'https://example.com/book_68.jpg', 'English',9),
-  (978000069, 'The Trial 3', 'Kurt Wolff Verlag', 315, 'A novel by Franz Kafka that follows the story of Josef K., who is arrested and prosecuted by a mysterious court system, leading him into a surreal and absurd ordeal', 3, 'https://example.com/book_69.jpg', 'German',10),
+  (978000069, 'Your Alter Ego', 'Kurt Wolff Verlag', 315, 'Simple steps to imagine your alter ego, aiming to figure out who you really are and unlock the best version of yourself.', 3, 'https://example.com/book_69.jpg', 'German',10),
   (978000070, 'The Secret Garden', 'Frederick Warne & Co.', 331, 'A novel by Frances Hodgson Burnett that tells the story of Mary Lennox, a young girl who discovers a hidden garden and experiences personalgrowth and healing as she tends to the neglected garden, accompanied by her friend Dickon and her cousin Colin', 8, 'https://example.com/book_70.jpg', 'English',1),
-  (978000071, 'To Kill 3 Mockingbird', 'J. B. Lippincott & Co.', 281, 'A novel by Harper Lee that explores themes of racial injustice and the loss of innocence through the eyes of Scout Finch as she observes her father, Atticus, defending a black man falsely accused of rape', 5, 'https://example.com/book_71.jpg', 'English',2),
+  (978000071, 'Tomorrow you are going to be born', 'J. B. Lippincott & Co.', 281, 'A fantasy story of a girl who sees her life all over again up to her age. What would you change in your life?', 5, 'https://example.com/book_71.jpg', 'English',2),
   (978000072, 'The Catcher of the Rye', 'Little, Brown and Company', 224, 'A novel by J.D. Salinger that follows the experiences of Holden Caulfield, a disillusioned teenager, as he navigates the challenges of adolescence and societal hypocrisy', 6, 'https://example.com/book_72.jpg', 'English',3),
-  (978000073, 'Grapes of Wrath', 'The Viking Press', 464, 'A novel by John Steinbeck that portrays the struggles of the Joad family, who are forced to leave their Oklahoma farm during the Great Depression and migrate to California in search of a better life', 4, 'https://example.com/book_73.jpg', 'English',4),
-  (978000074, 'Frankenstein 9', 'Lackington, Hughes, Harding, Mavor & Jones', 280, 'A novel by Mary Shelley that explores themes of creation, identity, and the consequences of unchecked ambition through the story of Victor Frankenstein and the creature he brings to life', 3, 'https://example.com/book_74.jpg', 'English',5),
+  (978000073, 'An elephant who could fly', 'The Viking Press', 464, 'An exiting story for our small friends hidding a deep ethical lesson.', 4, 'https://example.com/book_73.jpg', 'English',4),
+  (978000074, 'Dracula', 'Lackington, Hughes, Harding, Mavor & Jones', 280, 'A classical story of Dracula that every thriller-lover should read.', 3, 'https://example.com/book_74.jpg', 'English',5),
   (978000075, 'The Chronicles of Narnia', 'Geoffrey Bles', 767, 'A series of fantasy novels by C.S. Lewis that takes readers to the magical world of Narnia, where they embark on epic adventures alongside various characters, including the Pevensie siblings', 7, 'https://example.com/book_75.jpg', 'English',6),
   (978000076, 'A Tale of Two Cities', 'Chapman & Hall', 544, 'A novel by Charles Dickens set in London and Paris before and during the French Revolution, weaving together the lives of several characters against the backdrop of political turmoil', 5, 'https://example.com/book_76.jpg', 'English',7),
   (978000077, 'The Stranger', 'Gallimard', 123, 'A novel by Albert Camus that explores existential themes through the story of Meursault, a detached and indifferent man who becomes embroiled in a murder investigation', 4, 'https://example.com/book_77.jpg', 'French',8),
@@ -371,19 +579,20 @@ VALUES
   (978000085, 'Animal Farm', 'Secker & Warburg', 112, 'A satirical novella by George Orwell that uses a farm and its animals to allegorically depict the events leading up to the Russian Revolution and the subsequent rise of the Soviet Union', 7, 'https://example.com/book_85.jpg', 'English',6),
   (978000086, 'The Picture of Dorian White', 'Ward, Lock & Co.', 254, 'A novel by Oscar Wilde where a young man"s portrait ages while he remains eternally young, leading to a life of debauchery and moral corruption', 5, 'https://example.com/book_86.jpg', 'English',7),
   (978000087, 'The Big Prince', 'Reynal & Hitchcock', 96, 'A novella by Antoine de Saint-Exupéry about a young prince who travels from planet to planet, learning valuable life lessons along the way', 4, 'https://example.com/book_87.jpg', 'French',8),
-  (978000088, 'The Hobbit 2', 'George Allen & Unwin', 310, 'A fantasy novel by J.R.R. Tolkien about the hobbit Bilbo Baggins and his unexpected journey to reclaim the dwarf kingdom of Erebor from the dragon Smaug', 6, 'https://example.com/book_88.jpg', 'English',9),
+  (978000088, 'The story of Pi', 'George Allen & Unwin', 310, 'A moving story of a boy and a tiger.', 6, 'https://example.com/book_88.jpg', 'English',9),
   (978000089, 'Gone with the Wind', 'Macmillan Publishers', 1037, 'A novel by Margaret Mitchell set during the American Civil War, following the life of Scarlett O"Hara as she navigates love, loss, and the changing society of the South', 3, 'https://example.com/book_89.jpg', 'English',10),
   (978000090, 'The Great Gatsby', 'Charles Scribner"s Sons', 180, 'A novel by F. Scott Fitzgerald set in the Jazz Age, following the enigmatic millionaire Jay Gatsby and his pursuit of the elusive Daisy Buchanan', 5, 'https://example.com/book_90.jpg', 'English',1),
-  (978000091, 'The Odyssey of o', 'Homer', 442, 'An ancient Greek epic poem attributed to Homer, telling the story of Odysseus and his ten-year journey back home to Ithaca after the Trojan War', 5, 'https://example.com/book_91.jpg', 'Greek',2),
-  (978000092, 'The Adventures of Sherlock Holmes', 'George Newnes Ltd', 307, 'A collection of detective stories by Arthur Conan Doyle featuring the iconic character Sherlock Holmes and his loyal companion Dr. John Watson', 4, 'https://example.com/book_92.jpg', 'English',3),
-  (978000093, 'The Scarlet Letter', 'Ticknor, Reed & Fields', 238, 'A novel by Nathaniel Hawthorne set in 17th-century Puritan Boston, exploring themes of sin, guilt, and redemption through the story of Hester Prynne', 6, 'https://example.com/book_93.jpg', 'English',4),
+  (978000091, 'Giannis Ritsos', 'Homer', 442, 'An accurate biography of the poet Ritsos.', 5, 'https://example.com/book_91.jpg', 'Greek',2),
+  (978000092, 'Tuesday the 13th', 'George Newnes Ltd', 307, 'A trip to the nature and the thriller beggins.', 4, 'https://example.com/book_92.jpg', 'English',3),
+  (978000093, 'Searcing the hidden treasure', 'Ticknor, Reed & Fields', 238, 'A group of teens searcing for the treasure that their dead grandpa left for them.', 6, 'https://example.com/book_93.jpg', 'English',4),
   (978000094, 'The Trial', 'Kurt Wolff Verlag', 315, 'A novel by Franz Kafka that follows the story of Josef K., who is arrested and prosecuted by a mysterious court system, leading him into a surreal and absurd ordeal', 3, 'https://example.com/book_94.jpg', 'German',5),
   (978000095, 'The Secret Gardens', 'Frederick Warne & Co.', 331, 'A novel by Frances Hodgson Burnett that tells the story of Mary Lennox, a young girl who discovers a hidden garden and experiences personal growth and transformation', 8, 'https://example.com/book_95.jpg', 'English',6),
   (978000096, 'To Kill a Mockingbird', 'J. B. Lippincott & Co.', 281, 'A novel by Harper Lee that explores themes of racial injustice and the loss of innocence through the eyes of Scout Finch as she observes her father, Atticus, defending a black man falsely accused of rape', 5, 'https://example.com/book_96.jpg', 'English',7),
-  (978000097, 'The Catcher in the Rye', 'Little, Brown and Company', 224, 'A novel by J.D. Salinger that follows the experiences of Holden Caulfield, a disillusioned teenager, as he navigates the challenges of adolescence and societal hypocrisy', 6, 'https://example.com/book_97.jpg', 'English',8),
-  (978000098, 'The Grapes of Wrath', 'The Viking Press', 464, 'A novel by John Steinbeck that portrays the struggles of the Joad family, who are forced to leave their Oklahoma farm during the Great Depression and migrate to California in search of a better life', 4, 'https://example.com/book_98.jpg', 'English',9),
+  (978000097, 'Queen Elizabeth', 'Little, Brown and Company', 224, 'A biography of the Queen of England Elizabeth.', 6, 'https://example.com/book_97.jpg', 'English',8),
+   (978000098, 'The Grapes of Wrath', 'The Viking Press', 464, 'A novel by John Steinbeck that portrays the struggles of the Joad family, who are forced to leave their Oklahoma farm during the Great Depression and migrate to California in search of a better life', 4, 'https://example.com/book_98.jpg', 'English',9),
   (978000099, 'Frankenstein', 'Lackington, Hughes, Harding, Mavor & Jones', 280, 'A novel by Mary Shelley that explores themes of creation, identity, and the consequences of unchecked ambition through the story of Victor Frankenstein and the creature he brings to life', 3, 'https://example.com/book_99.jpg', 'English',10),
-  (978000100, 'Narnia', 'Geoffrey Bles', 767, 'A series of fantasy novels by C.S. Lewis that takes readers to the magical world of Narnia, where they embark on epic adventures alongside various characters, including the Pevensie siblings', 7, 'https://example.com/book_100.jpg', 'English',1);
+  (978000100, 'Looking the past together ', 'Geoffrey Bles', 767, 'A moving story, based on reality, of a couple trying to solve the issues of their past together aiming not to break up.', 7, 'https://example.com/book_100.jpg', 'English',1);
+
  
 
 INSERT INTO Reviews (Rating, Needs_approval, Username, ISBN, Comments) VALUES

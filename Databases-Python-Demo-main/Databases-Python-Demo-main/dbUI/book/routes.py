@@ -13,7 +13,7 @@ def getBook(username):
         search = request.args.get("search")
         cur = db.connection.cursor()
         if search:
-            search = f"SELECT ISBN, title, available_copies FROM book WHERE title LIKE '%{search}%'"
+            search = f"SELECT DISTINCT b.ISBN, b.title, b.available_copies FROM book b INNER JOIN belongs_to be ON be.isbn = b.isbn INNER JOIN written_by w ON w.isbn = b.isbn INNER JOIN authors a ON a.author_id = w.author_id WHERE b.title LIKE '%{search}%' OR a.ath_full_name LIKE '%{search}%' OR be.c_name LIKE '%{search}%' "
         else:
             search = "SELECT ISBN, title, available_copies FROM book"
            
