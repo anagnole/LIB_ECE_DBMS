@@ -28,7 +28,7 @@ def getBookInfo(username, ISBN):
         INNER JOIN category c ON c.c_name = be.c_name \
         INNER JOIN key_words k ON k.isbn = b.isbn \
         INNER JOIN reviews rw ON rw.isbn = b.isbn \
-        WHERE b.isbn = '{}';").format(ISBN)
+        WHERE b.isbn = {};").format(ISBN)
         cur.execute(query)
         column_names = [i[0] for i in cur.description]
         books = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
