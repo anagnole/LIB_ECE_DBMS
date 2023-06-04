@@ -10,8 +10,9 @@
   margin-top: 30px;
   margin-bottom: auto;
   background-color: #dce9dd;
+
   border-radius: 10px;
-  box-shadow: 5px 5px 0 0 rgb(75, 109, 39);
+  box-shadow: 5px 5px 0 0 rgb(109, 96, 39);
 }
 
 .updates {
@@ -53,6 +54,16 @@ main {
   gap: 20px;
 }
 
+.button-container2 {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 10px;
+  margin-top: 10px;
+  gap: 20px;
+}
+
 button {
   padding: 10px 10px;
   font-size: 16px;
@@ -66,6 +77,22 @@ button {
 }
 
 button:hover {
+  background-color: #486e49;
+}
+
+.buton {
+  padding: 10px 10px;
+  font-size: 16px;
+  border-radius: 15px;
+  border: none;
+  background-color: #90c892;
+  color: white;
+  cursor: pointer;
+  transition: background-color 0.5s;
+  font-family: 'Times New Roman', serif;
+}
+
+.buton:hover {
   background-color: #486e49;
 }
 
@@ -84,7 +111,7 @@ button:hover {
 }
 
 .clickable-row:hover {
-  background-color: #f5f5f5;
+  background-color: #23743b;
   cursor: pointer;
 }
 
@@ -102,4 +129,30 @@ button:hover {
 
 div {
   display: block;
+}
+
+table {
+  background-color: rgba(235, 243, 235, 0.726);
+}
+
+th, td {
+  border: 3px solid #1811032d;
+  padding: 8px;
+  text-align: center;
+
+
+}
+
+th {
+  background-color: #5b5c1da6;
+  font-weight: bold;
+  color: #333;
+}
+
+tr:nth-child(even) {
+  background-color: #cdecc185;
+}
+
+td.highlight {
+  background-color: #ffeeba;
 }

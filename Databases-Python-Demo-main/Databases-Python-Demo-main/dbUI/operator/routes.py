@@ -132,7 +132,7 @@ def getApprove(username):
         cur.close()
 
         cur = db.connection.cursor()
-        query = "SELECT username,rating,comments FROM reviews WHERE needs_approval = 1;"
+        query = "SELECT username,rating,comments,ISBN FROM reviews WHERE needs_approval = 1;"
         cur.execute(query)
         column_names = [i[0] for i in cur.description]
         reviews = [dict(zip(column_names, entry)) for entry in cur.fetchall()]

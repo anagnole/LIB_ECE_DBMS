@@ -1,6 +1,7 @@
 {% extends "global_layout.html" %}
 {% block content %}
 <div class="container">
+  {% include "flash_messages.html" %}
   <head>
       <title>Teacher Profile</title>
     <script>
@@ -8,20 +9,24 @@
           var checkbox = document.getElementById(x);
           var div = document.getElementById(y);
     
-          if (checkbox.checked) {
+          if (checkbox) {
               div.style.display = 'inline-block';
+              document.getElementById("firstdiv").style.display = 'block';
+              document.getElementById("lastdiv").style.display = 'block';
+              document.getElementById("passdiv").style.display = 'block';
+              document.getElementById("agediv").style.display = 'block';
               document.getElementById('submit').style.display = 'block';
           } else {
               div.style.display = 'none';
+              document.getElementById("firstdiv").style.display = 'none';
+              document.getElementById("lastdiv").style.display = 'none';
+              document.getElementById("passdiv").style.display = 'none';
               document.getElementById('submit').style.display = 'none';
           }
       }
     </script>
   </head>
   <div class = "table-container">
-    <form action="{{ url_for('teacher.deleteTeacher', username=information.username) }}" method="POST">
-      <button type="submit" class="button">Delete</button>
-    </form>
     <form action="/teacher/profile/{{information.username}}" method="POST">
       {{ form.hidden_tag() }}
       <h2>Your Profile</h2>
@@ -33,7 +38,7 @@
         <h3>First Name</h3>
         <div>
           {{information.First_name}}
-          <input type="checkbox" id="first" onclick="toggleDiv('first','firstdiv')">
+          
           <div class="updates" id="firstdiv">
             {{form.first_name(class = "form-control", placeholder = "Enter your new first name", required = False)}}
           </div>    
@@ -41,7 +46,6 @@
         <h3>Last Name</h3>
         <div>
           {{information.Last_name}}
-          <input type="checkbox" id="last" onclick="toggleDiv('last','lastdiv')">
           <div class="updates" id="lastdiv">
             {{form.last_name(class = "form-control", placeholder = "Enter your new last name", required = False)}}
           </div> 
@@ -49,14 +53,12 @@
         <h3>Password</h3>
         <div>
           {{information.u_password}}
-          <input type="checkbox" id="pass" onclick="toggleDiv('pass','passdiv')">
           <div class="updates" id="passdiv">
             {{form.password(class = "form-control", placeholder = "Enter your new password", required = False)}}
           </div> 
         <h3>Age</h3>
           <div>
             {{information.age}}
-            <input type="checkbox" id="age" onclick="toggleDiv('age','agediv')">
             <div class="updates" id="agediv">
               {{form.age(class = "form-control", placeholder = "Enter your new age", required = False)}}
             </div> 
@@ -66,6 +68,12 @@
         </div> 
       </div>
     </form>
+    <div class="button-container">
+      <button type="submit" id="first" onclick="toggleDiv('first','firstdiv')">Update</button>
+      <form action="{{ url_for('teacher.deleteTeacher', username=information.username) }}" method="POST">
+        <button type="submit" class="button">Delete</button>
+      </form>
+    </div>
   </div>
 </div>
 {% endblock content %}

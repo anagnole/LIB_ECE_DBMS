@@ -26,7 +26,7 @@ def getAdmin():
                 return redirect(url_for("admin.getAdmin"))
         return render_template("admin.html", pageTitle = "Admin Page")
     except Exception as e:
-        print(e)
+        flash(str(e), "danger")
         abort(500)  
 
 @admin.route("/admin/statistics" ,methods = ["GET", "POST"])
@@ -167,6 +167,7 @@ def getStatistics():
                                 )
     
     except Exception as e:
+        flash(str(e),"danger")
         abort(500) 
 
 @admin.route("/admin/operator", methods = ["GET", "POST"])
@@ -181,6 +182,7 @@ def pickOperator():
         teachers = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
         cur.close()
     except Exception as e:
+        flash(str(e),"danger")
         abort(500) 
     return render_template("pick_operator.html", teachers = teachers, pageTitle="Pick Operator")
 
@@ -204,8 +206,9 @@ def addSchool(username):
             cur.execute(query)
             db.connection.commit()
             cur.close()
+            flash("Successful School Insertion")
             return redirect(url_for("admin.getAdmin"))
         except Exception as e:
-            abort(500)
+            flash(str(e),"danger")
 
     return render_template("school.html", form = form3, pageTitle = "Create School")

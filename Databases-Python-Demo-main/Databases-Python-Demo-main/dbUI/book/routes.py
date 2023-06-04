@@ -24,7 +24,6 @@ def getBook(username):
         return render_template("book.html", books = books, username=username, pageTitle = "Books")
 
     except Exception as e:
-        ## if the connection to the database fails, return HTTP response 500
         flash(str(e), "danger")
         abort(500)
 
@@ -83,7 +82,6 @@ def getInsertBook(username):
             return redirect(url_for("operator.getOperator", username=username))
         except Exception as e:
             flash(str(e), "danger")
-            abort(500)
 
     return render_template("insertbook.html", username=username, form=form, pageTitle="Insert Book")
 

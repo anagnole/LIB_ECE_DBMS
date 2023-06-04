@@ -1,6 +1,7 @@
 {% extends "global_layout.html" %}
 {% block content %}
 <div class="container">
+    {% include "flash_messages.html" %}
     <head>
         <title>Books</title>
     </head>
@@ -9,10 +10,12 @@
         <h2>Find your next favorite page-turner here:</h2>
         
         <form action="/book/{{ username }}" method="GET">
-            <input type="text" name="search" placeholder="Search for a book">
-            <button type="submit">Search</button>
+            <div class="button-container">
+                <input type="text" name="search" placeholder="Search for a book">
+                <button type="submit">Search</button>
+            </div>
         </form>
-
+    </div>
         {% if books|length == 0 %}
             <h2 style="margin-top: 5rem;">No books found!</h1>
         {% else %}
@@ -22,7 +25,6 @@
               <tr>
                   <th>Book Title</th>
                   <th>Available copies</th>
-                  <th></th>
               </tr>
             </thead>
             <tbody>
