@@ -25,10 +25,12 @@
     </script>
   </head>
   <div class = "table-container">
-    <button type="submit" id="first" onclick="toggleDiv('first','firstdiv')">Update</button>
-    <form action="{{ url_for('student.deleteStudent', username=information.username) }}" method="POST">
-      <button type="submit" class="button">Delete</button>
-    </form>
+    <div class = "button-container">
+      <button type="submit" id="first" onclick="toggleDiv('first','firstdiv')">Update</button>
+      <form action="{{ url_for('student.deleteStudent', username=information.username) }}" method="POST">
+        <button type="submit" class="button">Delete</button>
+      </form>
+    </div>
     <form action="/student/profile/{{information.username}}" method="POST">
       {{ form.hidden_tag() }}
       <h2>Your Profile</h2>
@@ -58,8 +60,8 @@
             {{form.password(class = "form-control", placeholder = "Enter your new password", required = False)}}
           </div> 
         </div>
-        <div class="updates" id="submit">
-            {{form.submit}}
+        <div class="button-container" id="submit">
+            {{form.submit (class = "buton")}}
         </div> 
       </div>
     </form>

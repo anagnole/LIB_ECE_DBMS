@@ -21,6 +21,10 @@ def getStudent(username):
         query = ("SELECT Library_card FROM approves_user WHERE username = '{}';".format(username))
         cur.execute(query)
         result = cur.fetchone()
+        query = "SELECT b.ISBN, b.title, bo.b_date, bo.ret_date FROM borrows bo INNER JOIN book b ON b.isbn = bo.isbn WHERE bo.ret_date IS NOT NULL and bo.username = '{}';".format(username)
+        cur.execute(query)
+        column_names = [i[0] for i in cur.description]
+        old_borrows = [dict(zip(column_names, entry)) for entry in cur.fetchall()] 
 
         if result is not None:
             library_card = result[0]
@@ -29,8 +33,9 @@ def getStudent(username):
             has = 0
         cur.close()
 
-        return render_template("student.html", borrows = borrows, username = username, reserves = reserves, has=has, pageTitle = "Student Page")
+        return render_template("student.html",old_borrows = old_borrows, borrows = borrows, username = username, reserves = reserves, has=has, pageTitle = "Student Page")
     except Exception as e:
+        flash(str(e),"danger")
         abort(500)    
 
 @student.route("/student/profile/<string:username>", methods=['GET', 'POST'])

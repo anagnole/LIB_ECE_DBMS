@@ -18,6 +18,10 @@
 .updates {
   display:none;
 }
+.submitUpdate{
+  background-color: #90c892;
+  color: white;
+}
 
 body {
   display: flex;

@@ -21,15 +21,24 @@
               document.getElementById("firstdiv").style.display = 'none';
               document.getElementById("lastdiv").style.display = 'none';
               document.getElementById("passdiv").style.display = 'none';
+              document.getElementById("agediv").style.display = 'block';
               document.getElementById('submit').style.display = 'none';
           }
       }
     </script>
   </head>
-  <div class = "table-container">
+    <div class="table-container">
+      <h2>Your Profile</h2>
+      <div class = "button-container">
+        <button type="submit" id="first" onclick="toggleDiv('first','firstdiv')">Update</button>
+        <form action="{{ url_for('teacher.deleteTeacher', username=information.username) }}" method="POST">
+          <button class="buton">Delete</button>
+        </form>
+      </div>
+
     <form action="/teacher/profile/{{information.username}}" method="POST">
       {{ form.hidden_tag() }}
-      <h2>Your Profile</h2>
+      
       <div class = "table">
         <h3>Username</h3>
         <div>
@@ -56,6 +65,7 @@
           <div class="updates" id="passdiv">
             {{form.password(class = "form-control", placeholder = "Enter your new password", required = False)}}
           </div> 
+        </div>
         <h3>Age</h3>
           <div>
             {{information.age}}
@@ -63,17 +73,11 @@
               {{form.age(class = "form-control", placeholder = "Enter your new age", required = False)}}
             </div> 
           </div>
-        <div class="updates" id="submit">
-            {{form.submit}}
+        <div id="button-container">
+            {{form.submit(class = "buton")}}
         </div> 
       </div>
     </form>
-    <div class="button-container">
-      <button type="submit" id="first" onclick="toggleDiv('first','firstdiv')">Update</button>
-      <form action="{{ url_for('teacher.deleteTeacher', username=information.username) }}" method="POST">
-        <button type="submit" class="button">Delete</button>
-      </form>
-    </div>
   </div>
 </div>
 {% endblock content %}
