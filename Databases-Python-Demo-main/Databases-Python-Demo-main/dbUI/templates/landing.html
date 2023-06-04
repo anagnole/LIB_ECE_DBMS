@@ -9,13 +9,15 @@
   
 <div class="container">
   <header>
-    <h1 class="tlt">Welcome to our digital library!</h1>
+      <h1 class="tlt">Welcome to our digital library!</h1>
   </header>
   <main>
     <img class = imgg src = "{{ url_for('static', filename = 'img/output-onlinepngtools(1).png') }}" alt = ""><br>
-    <div class="button-container">
-      <button onclick="window.location.href='/login'">Login</button>
-      <button onclick="window.location.href='/signup'">Signup</button>
+    <div class = "margin">
+      <div class="button-container">
+        <button onclick="window.location.href='/login'">Login</button>
+        <button onclick="window.location.href='/signup'">Signup</button>
+      </div>
     </div>
   </main>
 </div>

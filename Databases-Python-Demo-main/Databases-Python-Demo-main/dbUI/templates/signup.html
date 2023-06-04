@@ -59,8 +59,9 @@
 
             <div>Pick one</div>
             {{ form.Role (class = "form-control", required = False)}}<br>
-
-            {{ form.SignUp }}
+            <div class = "button-container">
+                {{ form.SignUp(class = 'buton') }}
+            </div>
         </form>
     </div>
 </div>

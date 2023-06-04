@@ -189,6 +189,7 @@ def deleteOperator(username, op):
             cur = db.connection.cursor()
             cur.execute(query)
             db.connection.commit()
+            flash("Successful Delete", "success")
             cur.close()
             return redirect(url_for("operator.getOperator", username = op))
         except Exception as e:
