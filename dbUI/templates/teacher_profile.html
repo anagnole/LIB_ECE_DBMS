@@ -35,16 +35,16 @@
           <button class="buton">Delete</button>
         </form>
       </div>
-
+      <hr>
     <form action="/teacher/profile/{{information.username}}" method="POST">
       {{ form.hidden_tag() }}
       
       <div class = "table">
-        <h3>Username</h3>
+        <h4>Username</h4>
         <div>
           {{information.username}}
         </div>
-        <h3>First Name</h3>
+        <h4>First Name</h4>
         <div>
           {{information.First_name}}
           
@@ -52,21 +52,21 @@
             {{form.first_name(class = "form-control", placeholder = "Enter your new first name", required = False)}}
           </div>    
         </div>
-        <h3>Last Name</h3>
+        <h4>Last Name</h4>
         <div>
           {{information.Last_name}}
           <div class="updates" id="lastdiv">
             {{form.last_name(class = "form-control", placeholder = "Enter your new last name", required = False)}}
           </div> 
         </div>
-        <h3>Password</h3>
+        <h4>Password</h4>
         <div>
           {{information.u_password}}
           <div class="updates" id="passdiv">
             {{form.password(class = "form-control", placeholder = "Enter your new password", required = False)}}
           </div> 
         </div>
-        <h3>Age</h3>
+        <h4>Age</h4>
           <div>
             {{information.age}}
             <div class="updates" id="agediv">
@@ -74,9 +74,11 @@
             </div> 
           </div>
         <div id="button-container">
+          <hr>
             {{form.submit(class = "buton")}}
         </div> 
       </div>
+
     </form>
   </div>
 </div>
