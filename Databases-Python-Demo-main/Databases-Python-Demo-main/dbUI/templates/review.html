@@ -11,23 +11,23 @@
         <form method="POST" action="{{ url_for('bookinfo.review', username=username, ISBN=ISBN) }}">
             {{ form.hidden_tag() }}
             <div>
-                {{ form.Rating.label }}: {{ form.Rating( required = False)}}
+                {{ form.Rating.label }}: {{ form.Rating( class="form-control" ,required = False)}}
                 {% if form.Rating.errors %}       
                 <ul class = "errors">
                     {% for error in form.Rating.errors %}
-                    <li class = "text-danger">{{ error }}</li>
+                        <li class = "text-danger">{{ error }}</li>
                     {% endfor %}
                 </ul>
                 {% endif %}
             </div>
             <div>
-                {{ form.Comments.label }}: {{ form.Comments(class = "form-control") }}
+                {{ form.Comments.label }}: {{ form.Comments(class = "form-control", required = false) }}
                 {% for error in form.Comments.errors %}
                     <span style="color: rgb(126, 184, 99);">{{ error }}</span>
                 {% endfor %}
             </div>
-            <div>
-                {{ form.submit }}
+            <div class = "button-container">
+                {{ form.submit (class = "buton")}}
             </div>
         </form>
     </body>

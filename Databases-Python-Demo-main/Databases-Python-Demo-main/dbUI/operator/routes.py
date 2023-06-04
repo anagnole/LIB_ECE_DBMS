@@ -2,8 +2,6 @@ from flask import Flask, render_template, request, flash, redirect, url_for, abo
 from flask_mysqldb import MySQL
 from dbUI import db ## initially created by __init__.py, need to be used here
 from dbUI.operator import operator
-from dbUI.student.forms import StudentForm
-from dbUI.book import book
 from datetime import date
 
 def get_date():
@@ -115,10 +113,9 @@ def getOperator(username):
 
         return render_template("operator.html", books=books, todaydate=todaydate, username=username, latereturns=latereturns, usermeanrating=usermeanrating, categorymeanrating=categorymeanrating, pageTitle="Operator Page")
 
-    
     except Exception as e:
-        print(e)
-        abort(500)
+        flash(str(e), "danger")
+        return redirect(url_for("operator.getOperator",username = username))
 
 @operator.route("/operator/<string:username>/approve")
 def getApprove(username):

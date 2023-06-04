@@ -6,7 +6,6 @@ from dbUI.bookinfo import bookinfo
 from datetime import date
 from dbUI.bookinfo.forms import ReviewForm
 from dbUI.bookinfo.forms import UpdateBookForm
-from dbUI.bookinfo.forms import UpdateBookFormCopies
 from dbUI.student import student
 from dbUI.teacher import teacher
 
@@ -22,21 +21,22 @@ def getBookInfo(username, ISBN):
     """
     try:
         cur = db.connection.cursor()
-        query = ("SELECT DISTINCT b.ISBN, GROUP_CONCAT(DISTINCT a.Ath_full_name SEPARATOR ', ') AS authors, b.title, b.publisher, GROUP_CONCAT(DISTINCT c.c_name SEPARATOR ', ') AS categories, b.page_number, b.summary, GROUP_CONCAT(DISTINCT k.key_word SEPARATOR ', ') AS keywords, b.available_copies, b.b_language, AVG(rw.rating) AS rating FROM book b \
+        query = ("SELECT DISTINCT b.ISBN, GROUP_CONCAT(DISTINCT a.Ath_full_name SEPARATOR ', ') AS authors, b.title, b.publisher, GROUP_CONCAT(DISTINCT c.c_name SEPARATOR ', ') AS categories, b.page_number, b.summary, GROUP_CONCAT(DISTINCT k.key_word SEPARATOR ', ') AS keywords, b.available_copies, b.b_language FROM book b \
         INNER JOIN written_by w ON b.isbn = w.isbn \
         INNER JOIN authors a ON a.author_ID = w.author_ID \
         INNER JOIN belongs_to be ON be.isbn = b.isbn \
         INNER JOIN category c ON c.c_name = be.c_name \
         INNER JOIN key_words k ON k.isbn = b.isbn \
-        INNER JOIN reviews rw ON rw.isbn = b.isbn \
         WHERE b.isbn = {};").format(ISBN)
         cur.execute(query)
         column_names = [i[0] for i in cur.description]
+        query = "SELECT AVG(rating) as rating FROM reviews WHERE ISBN = {}".format(ISBN)
         books = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
+        cur.execute(query)
+        ratings = [dict(zip("rating",cur.fetchone()))]
         cur.close()
-        return render_template("bookinfo.html", books = books, username = username, isbn = ISBN, pageTitle = "Book Info")
+        return render_template("bookinfo.html", books = books,ratings = ratings[0], username = username, isbn = ISBN, pageTitle = "Book Info")
     except Exception as e:
-        ## if the connection to the database fails, return HTTP response 500
         flash(str(e), "danger")
         abort(500)
 
@@ -76,7 +76,6 @@ def returnbook(username, ISBN):
         cur.close()
 
         cur = db.connection.cursor()
-        todaydate = get_date()
         query = "CALL add_copies({}, '{}');".format(ISBN, username)
         cur.execute(query)
         db.connection.commit()
@@ -103,7 +102,7 @@ def cancel(username, ISBN):
         if(row):
             role = row[0]
         else: 
-            raise ValueError("'Incorrect Username or Password'")
+            raise ValueError("'User Not Found'")
         cur.close()
 
         cur = db.connection.cursor()
@@ -119,7 +118,6 @@ def cancel(username, ISBN):
             return redirect((url_for("teacher.getTeacher", username = username, ISBN=ISBN)))
 
     except Exception as e:
-        # If the connection to the database fails, return HTTP response 500
         flash(str(e), "danger")
         if (role == 'student'):
             return redirect((url_for("student.getStudent", username = username, ISBN=ISBN)))
@@ -144,7 +142,7 @@ def review(username, ISBN):
             if(row):
                 role = row[0] 
             else: 
-                raise ValueError("'Incorrect Username or Password'")
+                raise ValueError("'User Not Found'")
             cur.close()           
             if (role == 'student'):
                 needs_approval = 1
@@ -152,7 +150,7 @@ def review(username, ISBN):
                 needs_approval = 0 
         except Exception as e:
             flash(str(e), "danger")
-            abort(500)
+
         query = ("INSERT INTO reviews (Rating, Needs_approval, Username, ISBN, Comments) \
                     VALUES ({},{},'{}',{},'{}');"
                     .format(reviewData['Rating'].data,

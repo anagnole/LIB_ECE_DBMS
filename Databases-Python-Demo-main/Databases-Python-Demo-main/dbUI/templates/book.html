@@ -27,9 +27,9 @@
             </thead>
             <tbody>
               {% for book in books %}
-                  <tr>
-                        <td><a class="button" onclick="window.location.href='/bookinfo/{{ username }}/{{ book.ISBN }}'">{{ book.title }}</a></td>
-                        <td> {{ book.available_copies }} </td>
+                  <tr class = "clickable-row" onclick="window.location.href='/bookinfo/{{ username }}/{{ book.ISBN }}'" >
+                        <td>{{ book.title }}</td>
+                        <td>{{ book.available_copies }} </td>
                   </tr>
               {% endfor %}
           </tbody>

@@ -67,9 +67,6 @@ class UpdateBookForm(FlaskForm):
 
     submit = SubmitField("Update")   
 
-class UpdateBookFormCopies(FlaskForm):
-    submit = SubmitField("Add copy")
-
 class ReviewForm(FlaskForm):  
     Comments = StringField(label="Comments", validators=[Optional()])
     Rating = IntegerField(label="Rating", validators=[Optional(), NumberRange(min=1, max=5)])

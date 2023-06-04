@@ -51,6 +51,8 @@ main {
   display: flex;
   justify-content: center;
   align-items: center;
+  margin-bottom: 10px;
+  margin-top: 10px;
   gap: 20px;
 }
 
@@ -132,7 +134,9 @@ div {
 }
 
 table {
+  margin-top: 20px;
   background-color: rgba(235, 243, 235, 0.726);
+  margin-bottom: 20px;
 }
 
 th, td {
