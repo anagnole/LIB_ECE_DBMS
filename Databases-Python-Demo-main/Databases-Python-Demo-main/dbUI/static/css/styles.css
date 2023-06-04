@@ -136,11 +136,9 @@ table {
 }
 
 th, td {
-  border: 3px solid #1811032d;
+  border: 1px solid #36290f2d;
   padding: 8px;
   text-align: center;
-
-
 }
 
 th {
@@ -155,4 +153,12 @@ tr:nth-child(even) {
 
 td.highlight {
   background-color: #ffeeba;
+}
+
+th, td {
+  width: 350px;
+}
+
+.imgg {
+  width: 300px;
 }

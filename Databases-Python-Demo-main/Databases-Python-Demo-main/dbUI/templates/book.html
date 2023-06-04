@@ -10,15 +10,8 @@
         <h2>Find your next favorite page-turner here:</h2>
         
         <form action="/book/{{ username }}" method="GET">
-<<<<<<< HEAD
             <input type="text" name="search" placeholder="Search for a title, author or category">
             <button type="submit">Search</button>
-=======
-            <div class="button-container">
-                <input type="text" name="search" placeholder="Search for a book">
-                <button type="submit">Search</button>
-            </div>
->>>>>>> 18c826500a315f8747b7499d1d2c72bd67022de8
         </form>
     </div>
         {% if books|length == 0 %}

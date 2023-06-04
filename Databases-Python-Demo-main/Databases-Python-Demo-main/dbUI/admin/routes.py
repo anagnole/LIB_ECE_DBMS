@@ -20,7 +20,7 @@ def getAdmin():
             
             elif request.form.get('action') == 'restore':
                 backup_path = 'sql/backup.sql' 
-                restore_command = ['C:/xampp/mysql/bin/mysql', '--user=root', 'library', '-e', 'source {}'.format(backup_path)]
+                restore_command = ['C:/xampp/mysql/bin/mysql.exe', '--user=root', 'library', '-e', 'source {}'.format(backup_path)]
                 subprocess.run(restore_command)
                 
                 return redirect(url_for("admin.getAdmin"))
