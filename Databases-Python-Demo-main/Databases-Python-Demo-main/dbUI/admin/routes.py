@@ -14,13 +14,13 @@ def getAdmin():
         if request.method == 'POST':
             if request.form.get('action') == 'backup':
                 backup_path = 'sql/backup.sql' 
-                backup_command = ['C:/xampp/mysql/bin/mysqldump', '--user=root', 'library', '--result-file=' + backup_path]
+                backup_command = ['C:/xampp/mysql/bin/mysqldump.exe', '--user=root', 'library', '--result-file=' + backup_path]
                 subprocess.run(backup_command)
                 return redirect(url_for("admin.getAdmin"))
             
             elif request.form.get('action') == 'restore':
                 backup_path = 'sql/backup.sql' 
-                restore_command = ['C:/xampp/mysql/bin/mysql', '--user=root', 'library', '-e', 'source {}'.format(backup_path)]
+                restore_command = ['C:/xampp/mysql/bin/mysql.exe', '--user=root', 'library', '-e', 'source {}'.format(backup_path)]
                 subprocess.run(restore_command)
                 
                 return redirect(url_for("admin.getAdmin"))
@@ -29,7 +29,7 @@ def getAdmin():
         flash(str(e), "danger")
         abort(500)  
 
-@admin.route("/admin/statistics" ,methods = ["GET", "POST"])
+@admin.route("/admin/statistics", methods = ["GET", "POST"])
 def getStatistics():     
     form = AdminForm()
     form2 = Admin2Form()

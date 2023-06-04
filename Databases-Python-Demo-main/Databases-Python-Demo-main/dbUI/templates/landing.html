@@ -2,14 +2,17 @@
 <html>
 <head>
   <title>Landing Page</title>
+  
   <link rel="stylesheet" type="text/css" href="..\static\css\styles.css">
 </head>
 <body>
+  
 <div class="container">
   <header>
     <h1 class="tlt">Welcome to our digital library!</h1>
   </header>
   <main>
+    <img src = "{{ url_for('static', filename = 'images/errors/download.jpg') }}" alt = "">
     <div class="button-container">
       <button onclick="window.location.href='/login'">Login</button>
       <button onclick="window.location.href='/signup'">Signup</button>
