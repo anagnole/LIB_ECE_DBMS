@@ -15,31 +15,31 @@
             <button id="approve" onclick = "window.location.href= '/operator/{{ username }}/approve'">Approve library cards and reviews</button>
         </div>
     </div>
-
+    <hr>
     <h3>Books listed</h3>
-    
+    <div class="button-container">
     <form action="/operator/{{ username }}" method="GET">
         <input type="text" name="searchtitle" placeholder="Search for a title">
-        <button type="submit">Search for a title</button>
+        <button class="circle" type="submit"><i class="fas fa-search search-icon"></i></button>
     </form>
-
     <form action="/operator/{{ username }}" method="GET">
         <input type="text" name="searchcategory" placeholder="Search for a category">
-        <button type="submit">Search for a category</button>
+        <button type="submit"><i class="fas fa-search search-icon"></i></button>
     </form>
-
+    </div>
+    <div class="button-container">
     <form action="/operator/{{ username }}" method="GET">
         <input type="text" name="searchauthor" placeholder="Search for an author">
-        <button type="submit">Search for an author</button>
+        <button type="submit"><i class="fas fa-search search-icon"></i></button>
     </form>
-
     <form action="/operator/{{ username }}" method="GET">
         <input type="text" name="searchcopies" placeholder="Search for available copies">
-        <button type="submit">Search for available copies</button>
+        <button type="submit"><i class="fas fa-search search-icon"></i></button>
     </form>
+    </div>
 
     {% if books|length == 0 %}
-    <h2 style="margin-top: 5rem;">No books found!</h2>
+    <p style="margin-top: 5rem;">No books found!</p>
     {% else %}
     <div class="table-responsive">
         <table id="book" class="table">
@@ -60,26 +60,27 @@
         </table>
     </div>
     {% endif %}
-
+    <hr>
     <h3>Users who must return books</h3>
     
+    <div class="button-container">
     <form action="/operator/{{ username }}" method="GET">
         <input type="text" name="searchfirstname" placeholder="Search for a first name">
-        <button type="submit">Search for a First Name</button>
+        <button type="submit"><i class="fas fa-search search-icon"></i></button>
     </form>
 
     <form action="/operator/{{ username }}" method="GET">
         <input type="text" name="searchlastname" placeholder="Search for a last name">
-        <button type="submit">Search for a Last Name</button>
+        <button type="submit"><i class="fas fa-search search-icon"></i></button>
     </form>
 
     <form action="/operator/{{ username }}" method="GET">
         <input type="text" name="searchdayslate" placeholder="Search for days late">
-        <button type="submit">Search for Days Late</button>
+        <button type="submit"><i class="fas fa-search search-icon"></i></button>
     </form>
-
+    </div>
     {% if latereturns|length == 0 %}
-        <h2 style="margin-top: 5rem;">No late returns found!</h2>
+        <p style="margin-top: 5px;">No late returns found!</p>
     {% else %}
         <div class="table-responsive">
         <table id="latereturns" class="table">
@@ -102,16 +103,16 @@
         </table>
         </div>
         {%endif%}
-
-        <h3>Mean rating per User and Category</h3>
+        <hr>
+        <h3>Mean rating per User</h3>
 
         <form action="/operator/{{ username }}" method="GET">
             <input type="text" name="searchusername" placeholder="Search for username">
-            <button type="submit">Search for Username</button>
+            <button type="submit"><i class="fas fa-search search-icon"></i></button>
         </form>
         
         {% if usermeanrating|length == 0 and categorymeanrating|length == 0 %}
-            <h2 style="margin-top: 5rem;">No mean ratings found!</h2>
+            <h2 style="margin-top: 5px;">No mean ratings found!</h2>
         {% else %}
             {% if usermeanrating|length > 0 %}
                 <div class="table-responsive">
@@ -133,12 +134,14 @@
                     </table>
                 </div>
             {% endif %}
-        
+            <hr>
+            <h3>Mean rating per Category</h3>
+            <div class="button-container">
             <form action="/operator/{{ username }}" method="GET">
                 <input type="text" name="searchcategory" placeholder="Search for category">
-                <button type="submit">Search for Category</button>
+                <button type="submit"><i class="fas fa-search search-icon"></i></button>
             </form>
-
+            </div>
             {% if categorymeanrating|length > 0 %}
                 <div class="table-responsive">
                     <table id="categorymeanrating" class="table">

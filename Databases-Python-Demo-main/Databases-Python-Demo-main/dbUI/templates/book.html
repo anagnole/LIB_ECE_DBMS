@@ -5,13 +5,14 @@
     <head>
         <title>Books</title>
     </head>
-    <div class="button-container">
+    <body>      
         <h1>Borrow a Book!</h1>
         <h2>Find your next favorite page-turner here:</h2>
-        
+    </body>
+    <div class="search-container">        
         <form action="/book/{{ username }}" method="GET">
             <input type="text" name="search" placeholder="Search for a title, author or category">
-            <button type="submit">Search</button>
+            <button type="submit"><i class="fas fa-search search-icon"></i></button>
         </form>
     </div>
         {% if books|length == 0 %}

@@ -6,10 +6,10 @@
         <title>Approve Library Cards and Reviews</title>
     </head>
     <body>
-        <h3>Approve Library Cards</h3>
-        <p>Click to appove the request!</p>
+        <h2>Approve Library Cards</h2>
+        <h3>Click to appove the request!</h3>
         {% if librarycards|length == 0 %}
-        <h2 style="margin-top: 5rem;">No library card approvals pending!</h2>
+        <p style="margin-top: 5px;">No library card approvals pending!</p>
         {% else %}
         <div class="table-responsive">
             <table id="librarycards" class="table">
@@ -28,11 +28,11 @@
             </table>
         </div>
         {% endif %}
-
-        <h3>Approve Reviews</h3>
-        <p>Click to appove the request!</p>
+        <hr>
+        <h2>Approve Reviews</h2>
+        <h3>Click to appove the request!</h3>
         {% if reviews|length == 0 %}
-        <h2 style="margin-top: 5rem;">No review approvals pending!</h2>
+        <p style="margin-top: 5px;">No review approvals pending!</p>
         {% else %}
         <div class="table-responsive">
             <table id="reviews" class="table">

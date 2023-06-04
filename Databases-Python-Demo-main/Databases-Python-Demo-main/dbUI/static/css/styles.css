@@ -7,7 +7,7 @@
   width: 1000px;
   height: auto;
   margin: auto;
-  margin-top: 30px;
+  margin-top: 50px;
   margin-bottom: auto;
   background-color: #dce9dd;
 
@@ -58,6 +58,7 @@ main {
   margin-bottom: 10px;
   margin-top: 10px;
   gap: 20px;
+  position: relative;
 }
 
 .button-container2 {
@@ -68,6 +69,7 @@ main {
   margin-bottom: 10px;
   margin-top: 10px;
   gap: 20px;
+  position: relative;
 }
 
 button {
@@ -75,7 +77,7 @@ button {
   font-size: 16px;
   border-radius: 15px;
   border: none;
-  background-color: #90c892;
+  background-color: #594327;
   color: white;
   cursor: pointer;
   transition: background-color 0.5s;
@@ -83,7 +85,7 @@ button {
 }
 
 button:hover {
-  background-color: #486e49;
+  background-color: #a88e7d;
 }
 
 .buton {
@@ -91,7 +93,7 @@ button:hover {
   font-size: 16px;
   border-radius: 15px;
   border: none;
-  background-color: #90c892;
+  background-color: #594327;
   color: white;
   cursor: pointer;
   transition: background-color 0.5s;
@@ -99,25 +101,30 @@ button:hover {
 }
 
 .buton:hover {
-  background-color: #486e49;
+  background-color: #a88e7d;
 }
 
 .card {
   position:absolute;
   display:inline-flex;
+  margin: 10px;
   margin-left: 700px;
   width: 200px;
   height: auto;
-  background-color: #f8f8f8;
-  border: 1px solid #ddd;
+  background-color:  #594327;
+  color: #ffffff;
   border-radius: 4px;
   padding: 20px;
-  margin-bottom: 20px;
+  margin-top: -60px;
   font-family: 'Times New Roman', serif;
+  border-radius: 10px;
+  box-shadow: 3px 3px 0 0 rgb(29, 1, 1);
+  z-index: 2;
 }
 
 .clickable-row:hover {
-  background-color: #23743b;
+  background-color: #89611b6e;
+  color: #ffffff;
   cursor: pointer;
 }
 
@@ -129,8 +136,9 @@ button:hover {
 }
 
 .profile-image {
+  margin-top: 10px;
   position: relative;
- 
+  border-radius: 50%;
 }
 
 div {
@@ -139,7 +147,7 @@ div {
 
 table {
   margin-top: 20px;
-  background-color: rgba(235, 243, 235, 0.726);
+  background-color: rgb(249, 248, 248);
   margin-bottom: 20px;
 }
 
@@ -147,16 +155,21 @@ th, td {
   border: 1px solid #36290f2d;
   padding: 8px;
   text-align: center;
+  background-color: #5b5c1da6;
 }
 
 th {
-  background-color: #5b5c1da6;
+  background-color: #797a68a6;
   font-weight: bold;
-  color: #333;
+}
+
+thead {
+  background-color: #594327;
+  color: white;
 }
 
 tr:nth-child(even) {
-  background-color: #cdecc185;
+  background-color: #ffffff;
 }
 
 td.highlight {
@@ -169,4 +182,49 @@ th, td {
 
 .imgg {
   width: 300px;
+}
+
+.search-container {
+  position: flex;
+  top: 10px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  justify-content: left;
+  align-items: left;
+  margin-bottom: 10px;
+  gap: 20px;
+}
+
+#nav-bar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  margin-bottom: 10px;
+  z-index: 2;
+}
+
+#nav-bar-text {
+  color: #133c26; 
+}
+
+#navbar-items {
+  text-decoration: none;
+  color: #133c26; 
+}
+
+#navbar-items:hover {
+  color: #608069; 
+}
+
+.fa-home {
+  margin-left: 5px;
+  color: #133c26; 
+  background-color: #ffffffa8; 
+  border-radius: 50%; 
+  padding: 5px; 
+}
+
+h1 {
+  margin-top: 20px;
 }
