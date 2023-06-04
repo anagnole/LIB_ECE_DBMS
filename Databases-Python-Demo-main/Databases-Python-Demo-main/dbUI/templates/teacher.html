@@ -14,17 +14,17 @@
           {% if has == 1 %}
             <h3>Library Card</h3>
             <p><strong>Username:</strong> {{ username }}</p>
-            <img class="profile-image" src="https://cdn.pixabay.com/photo/2015/10/05/22/37/blank-profile-picture-973460_1280.png" alt="Profile Picture">
+            <img class="profile-image" src="https://e7.pngegg.com/pngimages/349/288/png-clipart-teacher-education-student-course-school-avatar-child-face.png" alt="Profile Picture">
           {% else %}
             <h3>Unfortunately you do not own a library Card!</h3>
             <p>Please wait for approval from an operator.</p>
           {% endif %}
         </div>
       </div>
-
+      <hr>
       <h2>Current Borrows</h2>
       {% if borrows|length == 0 %}
-              <h2 style="margin-top: 5rem;">No Borrows found!</h1>
+              <p style="margin-top: 5px;">No Borrows found!</p>
         {% else %}
       <div class="table-responsive">
       <table id="borrows" class="table">
@@ -51,11 +51,12 @@
         </table>
       </div>
       {%endif%}
+      <hr>
   
       <h2>Current Reservations</h2>
 
         {% if reserves|length == 0 %}
-            <h2 style="margin-top: 5rem;">No Reservations found!</h1>
+            <p style="margin-top: 5px;">No Reservations found!</p>
         {% else %}
         <div class="table-responsive">
           <table id="reserves" class="table">

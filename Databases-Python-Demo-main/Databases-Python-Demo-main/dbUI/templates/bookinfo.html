@@ -6,10 +6,10 @@
         <title>Book Info</title>
     </head>
     <div>
+        <tbody>
         <h1>Find out more information about:</h1>
         <div class="table-responsive"></div>
-        <table id="bookinfo" class="table">
-            <tbody>
+            <table id="bookinfo" class="table">
                 {% for book in books %}
                 <tr>
                     <th>Book Title</th>
@@ -56,9 +56,33 @@
                     <td> {{ ratings.r }} </td>
                 </tr>
                 {% endfor %}
-
+            </table>
+            <h2>Book's reviews:</h2>
+            {% if reviews|length == 0 %}
+                <p style="margin-top: 5px;">No reviews found!</p>
+            {% else %}
+            <div class="table-responsive"></div>
+            <table id="book" class="table">
+                <thead>
+                    <tr>
+                        <th>Username</th>
+                        <th>Rating</th>
+                        <th>Comments</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for review in reviews %}
+                    <tr>
+                        <td>{{ review.username }}</td>
+                        <td>{{ review.rating }}</td>
+                        <td>{{ review.comments }}</td>
+                    </tr>
+                    {% endfor %}
                 </tbody>
             </table>
+            
+            {%endif%}
+            </tbody>
             <div class="button-container">
                 <form action="{{ url_for('bookinfo.borrow', username=username, ISBN=books[0].ISBN) }}" method="POST">
                     <button type="submit" class="button">Borrow / Reserve</button>

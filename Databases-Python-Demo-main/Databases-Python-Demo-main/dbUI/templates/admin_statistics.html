@@ -38,7 +38,9 @@
             </table>
         </div>
     </div>
+    
     <form action="/admin/statistics" method="POST">
+        <hr>
         {{ form2.hidden_tag() }}
         Pick a Category
         <div class = "button-container">
@@ -62,6 +64,7 @@
               {% endfor %}
           </tbody>
         </table>
+        <hr>
         <h3>Teachers who have borrowed a book of this category in 2023</h3>
         <table id="teachers" class="table">
             <thead>
@@ -81,6 +84,7 @@
         </table>
     </div>
     <div class="table-responsive">
+        <hr>
         <h3>Teachers who have borrowed the most books (under 40 Years Old)</h3>
         <table id="young_teachers" class="table">
             <thead>
@@ -102,6 +106,7 @@
         </table>
     </div>
     <div class="table-responsive">
+        <hr>
         <h3>Authors whose books have not yet been borrowed</h3>
         <table id="authors_no" class="table">
             <thead>
@@ -119,6 +124,7 @@
         </table>
     </div>
     <div class="table-responsive">
+        <hr>
         <h3>Operators who have registered the same amount of borrows with another operator (more than 20 borrows)</h3>
         <table id="operators" class="table">
             <thead>
@@ -142,6 +148,7 @@
         </table>
     </div>
     <div class="table-responsive">
+        <hr>
         <h3>Top 3 Category Pairs</h3>
         <table id="categories" class="table">
             <thead>
@@ -161,6 +168,7 @@
         </table>
     </div>
     <div class="table-responsive">
+        <hr>
         <h3>Authors who have written 5 or less books than the Author who has written the most books</h3>
         <table id="authors_5" class="table">
             <thead>
