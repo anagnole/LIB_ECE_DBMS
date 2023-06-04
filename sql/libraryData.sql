@@ -114,16 +114,6 @@ UPDATE book SET Available_copies = Available_copies+1 WHERE isbn = isbn1;
   END IF;
 END $$
 
-CREATE PROCEDURE check_for_reserves(
-  IN isbn1 INT
-)
-BEGIN
-  IF ((SELECT Available_copies FROM book where isbn1 = isbn ) = 1 AND EXISTS (SELECT 1 FROM reserves WHERE isbn1 = isbn)) THEN
-    CALL new_borrow(isbn1, (SELECT username FROM reserves WHERE isbn = isbn1 ORDER BY r_date LIMIT 1), current_timestamp);
-    DELETE FROM reserves WHERE isbn = isbn1 AND Username = (SELECT username FROM reserves WHERE isbn = isbn1);  
-  END IF;
-END $$
-
 CREATE PROCEDURE delete_user(
   IN Username1 VARCHAR(45)
 )
@@ -1417,7 +1407,8 @@ INSERT INTO borrows (Username, ISBN, b_date, ret_date) VALUES
 ('user12', 978000063, '2023-06-04', NULL), 
 ('user9', 978000040, '2023-06-04', NULL), 
 ('user18', 978000043, '2023-03-24', NULL),
-('user8', 978000068, '2023-05-13', NULL);
+('user8', 978000068, '2023-05-13', NULL),
+('user32', 978000084,'2023-5-01',NULL); 
 
 
 INSERT INTO reserves (Username, ISBN, r_date) VALUES 

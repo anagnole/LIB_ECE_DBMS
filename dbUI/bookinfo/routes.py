@@ -6,8 +6,6 @@ from dbUI.bookinfo import bookinfo
 from datetime import date
 from dbUI.bookinfo.forms import ReviewForm
 from dbUI.bookinfo.forms import UpdateBookForm
-from dbUI.student import student
-from dbUI.teacher import teacher
 
 def get_date():
     today = date.today()
@@ -30,17 +28,12 @@ def getBookInfo(username, ISBN):
         WHERE b.isbn = {};").format(ISBN)
         cur.execute(query)
         column_names = [i[0] for i in cur.description]
+        query = "SELECT AVG(rating) as rating FROM reviews WHERE ISBN = {}".format(ISBN)
         books = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
-        query = "SELECT AVG(rating) as rating FROM reviews WHERE ISBN = {};".format(ISBN)
         cur.execute(query)
         ratings = [dict(zip("rating",cur.fetchone()))]
-        cur = db.connection.cursor()
-        query = "SELECT username, rating, comments FROM reviews where isbn={} and comments IS NOT NULL AND needs_approval = 0;".format(ISBN)
-        cur.execute(query)
-        column_names = [i[0] for i in cur.description]
-        reviews=[dict(zip(column_names, entry)) for entry in cur.fetchall()]
         cur.close()
-        return render_template("bookinfo.html", books = books,ratings = ratings[0], username = username, reviews=reviews, isbn = ISBN, pageTitle = "Book Info")
+        return render_template("bookinfo.html", books = books,ratings = ratings[0], username = username, isbn = ISBN, pageTitle = "Book Info")
     except Exception as e:
         flash(str(e), "danger")
         abort(500)
@@ -168,11 +161,7 @@ def review(username, ISBN):
             cur.execute(query)
             db.connection.commit()
             cur.close()
-            if (role == 'student'):
-                flash("Review request submitted!", "success")
-            else:
-                flash("Review submitted successfully!", "success")
-            
+            flash("Review submitted successfully!", "success")
             return redirect(url_for("bookinfo.getBookInfo", username = username, ISBN = ISBN))
         except Exception as e:
             flash(str(e), "danger")

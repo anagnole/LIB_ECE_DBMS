@@ -40,7 +40,7 @@ def getTeacher(username):
 
 @teacher.route("/teacher/delete/<string:username>", methods=['GET', 'POST'])
 def deleteTeacher(username):
-    if(request.method == "POST"):
+    if(request.method == "GET"):
         try:
             query = "SELECT role_user FROM users WHERE username = '{}';".format(username)
             cur = db.connection.cursor()
@@ -48,8 +48,10 @@ def deleteTeacher(username):
             row = cur.fetchone()
             if(row):
                 role = row[0]
+                print(role)
             if(role == 'operator'):
-                raise ValueError("'Operators can't delete Operators'")
+                flash("'Operators can't be deleted'", "danger")
+                return redirect(url_for("teacher.getTeacherProfile", username = username))
             cur.close()
             query = "CALL delete_user('{}');".format(username)
             cur = db.connection.cursor()
@@ -60,6 +62,7 @@ def deleteTeacher(username):
         except Exception as e:
             flash(str(e), "danger")
             return redirect(url_for("teacher", username = username))
+    return redirect(url_for("teacher.getTeacherProfile", username = username))
  
             
 
@@ -83,7 +86,7 @@ def getTeacherProfile(username):
                 db.connection.commit()
                 cur.close()
             except Exception as e:
-                abort(500)
+                raise ValueError(e)
 
         if teacherinfo["last_name"].data:
             try:
@@ -96,7 +99,7 @@ def getTeacherProfile(username):
                 db.connection.commit()
                 cur.close()
             except Exception as e:
-                abort(500)  
+                raise ValueError(e)  
 
         if teacherinfo["password"].data:
             try:
@@ -109,8 +112,8 @@ def getTeacherProfile(username):
                 db.connection.commit()
                 cur.close()
             except Exception as e:
-                abort(500)     
-
+                raise ValueError(e)
+            
         if teacherinfo["age"].data:
             try:
                 query = "UPDATE teacher_user SET age = '{}' WHERE Username = '{}';".format(
@@ -123,7 +126,7 @@ def getTeacherProfile(username):
                 cur.close()
 
             except Exception as e:
-                abort(500)                
+                flash(str(e),"danger")             
 
     try:
         cur = db.connection.cursor()
