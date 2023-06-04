@@ -88,14 +88,15 @@
                 <tr>
                     <th>User's First Name</th>
                     <th>User's Last Name</th>   
+                    <th>Days Late from borrow</th> 
                 </tr>
             </thead>
             <tbody>
             {% for latereturn in latereturns %}
-                <tr>
-                    
+                <tr class = "clickable-row" onclick="location.href='/operator/delete/{{ latereturn.username }}/{{username}}';">
                     <td> {{ latereturn.first_name }} </td>
                     <td> {{ latereturn.last_name }} </td>
+                    <td> {{ latereturn.late }} </td>
                 </tr>
             {% endfor %}
             </tbody>

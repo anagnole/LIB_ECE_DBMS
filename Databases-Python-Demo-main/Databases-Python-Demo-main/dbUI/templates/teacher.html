@@ -83,6 +83,31 @@
             </table>
           </div>
           {% endif %}
+          <h2>Old Borrows</h2>
+      {% if old_borrows|length == 0 %}
+          <p style="margin-top: 2rem;">No Old Borrows found!</p>
+      {% else %}
+      <div class="table-responsive">
+      <table id="old_borrows" class="table">
+          <thead>
+            <tr>
+                <th>Book Title</th>
+                <th>Borrow Date</th>
+                <th>Return Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for borrow in old_borrows %}
+                <tr>
+                    <td> {{ borrow.title }} </td>
+                    <td> {{ borrow.b_date }} </td>
+                    <td> {{ borrow.ret_date }} </td>                    
+                </tr>
+            {% endfor %}
+        </tbody>
+        </table>
+      </div>
+      {% endif %}
       </div>
   </html>
   

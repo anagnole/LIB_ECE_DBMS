@@ -49,7 +49,7 @@ def getOperator(username):
         searchlastname = request.args.get("searchlastname")
         searchdayslate = request.args.get("searchdayslate")
         cur = db.connection.cursor()
-        query = "SELECT b.isbn, uv.first_name, uv.last_name, br.b_date FROM usernameview uv \
+        query = "SELECT uv.username, b.isbn, uv.first_name, uv.last_name, br.b_date, DATEDIFF(current_timestamp, br.b_date) - 7 as late FROM usernameview uv \
                 INNER JOIN borrows br ON uv.username = br.username \
                 INNER JOIN book b ON br.isbn = b.isbn \
                 WHERE br.ret_date IS NULL \
@@ -172,3 +172,25 @@ def getReview(username):
     except Exception as e:
         flash(str(e), "danger")
         abort(500)
+
+@operator.route("/operator/delete/<string:username>/<string:op>", methods=['GET', 'POST'])
+def deleteOperator(username, op):
+        try:
+            query = "SELECT role_user FROM users WHERE username = '{}';".format(username)
+            cur = db.connection.cursor()
+            cur.execute(query)
+            row = cur.fetchone()
+            if(row):
+                role = row[0]
+            if(role == 'operator'):
+                raise ValueError("'Operators can't delete Operators'")
+            cur.close()
+            query = "CALL delete_user('{}');".format(username)
+            cur = db.connection.cursor()
+            cur.execute(query)
+            db.connection.commit()
+            cur.close()
+            return redirect(url_for("operator.getOperator", username = op))
+        except Exception as e:
+            flash(str(e), "danger")
+            return redirect(url_for("operator.getOperator", username = op))

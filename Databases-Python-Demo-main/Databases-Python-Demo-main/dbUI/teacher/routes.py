@@ -21,7 +21,11 @@ def getTeacher(username):
         query = ("SELECT Library_card FROM approves_user WHERE username = '{}';".format(username))
         cur.execute(query)
         result = cur.fetchone()
- 
+        query = "SELECT b.ISBN, b.title, bo.b_date, bo.ret_date FROM borrows bo INNER JOIN book b ON b.isbn = bo.isbn WHERE bo.ret_date IS NOT NULL and bo.username = '{}';".format(username)
+        cur.execute(query)
+        column_names = [i[0] for i in cur.description]
+        old_borrows = [dict(zip(column_names, entry)) for entry in cur.fetchall()] 
+
         if result is not None:
             library_card = result[0]
             has = 1 if library_card == 1 else 0
@@ -29,8 +33,9 @@ def getTeacher(username):
             has = 0
         cur.close()
 
-        return render_template("teacher.html", borrows = borrows, username = username, reserves = reserves, has=has,pageTitle = "Teacher Page")
+        return render_template("teacher.html",old_borrows=old_borrows, borrows = borrows, username = username, reserves = reserves, has=has,pageTitle = "Teacher Page")
     except Exception as e:
+        flash(str(e), "danger")
         abort(500)    
 
 @teacher.route("/teacher/delete/<string:username>", methods=['GET', 'POST'])
@@ -44,7 +49,7 @@ def deleteTeacher(username):
             if(row):
                 role = row[0]
             if(role == 'operator'):
-                raise ValueError("'Operators can't delete themselves'")
+                raise ValueError("'Operators can't delete Operators'")
             cur.close()
             query = "CALL delete_user('{}');".format(username)
             cur = db.connection.cursor()
@@ -53,7 +58,10 @@ def deleteTeacher(username):
             cur.close()
             return redirect(url_for("index"))
         except Exception as e:
-            abort(500) 
+            flash(str(e), "danger")
+            return redirect(url_for("teacher", username = username))
+ 
+            
 
 @teacher.route("/teacher/profile/<string:username>", methods=['GET', 'POST'])
 def getTeacherProfile(username):
