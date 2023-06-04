@@ -1,32 +1,67 @@
 {% extends "global_layout.html" %}
 {% block content %}
 <div class="container">
+    {% include "flash_messages.html" %}
     <head>
         <title>Update Book Info</title>
     </head>
     <div>
-        <h1>Find out more information about:</h1>
-        <form method="POST">
-            {{ form.hidden_tag() }}
-
+        <h1>Update Book's Information:</h1>
+        
             <div class="table-responsive"></div>
             <table id="bookinfo" class="table">
                 <tbody>
                     {% for book in books %}
                     <tr>
+                        <th>Available Copies</th>
+                        <td> {{ book.available_copies }} </td>
+                        <td> 
+                            <form action="/update_book_info/add/{{ ISBN }}" method="POST">
+                                <button type="submit">Add Copy</button>
+                            </form>
+                        </td>
+                    </tr>
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                    <tr>
                         <th>Book Title</th>
                         <td> {{ book.title }} </td>
-                        <td>{{ form.Title( class="form-control", value=book.title)}}</td>
+                        <td>
+                            {{ form.Title( class="form-control", value=book.title, required = false)}}
+                            {% if form.Title.errors %}
+                            <ul class="errors">
+                                {% for error in form.Title.errors %}
+                                    <li class ="text-danger">{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </td>
                     </tr>
                     <tr>
                         <th>Author(s)</th>
                         <td> {{ book.authors }} </td>
-                        <td> {{ form.Authors( class="form-control", value=book.authors)}} </td>
+                        <td> {{ form.Authors( class="form-control", value=book.authors)}} 
+                            {% if form.Authors.errors %}
+                            <ul class="errors">
+                                {% for error in form.Authors.errors %}
+                                    <li class ="text-danger">{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </td>
                     </tr>
                     <tr>
                         <th>Publisher</th>
                         <td> {{ book.publisher }} </td>
-                        <td> {{ form.Publisher( class="form-control", value=book.publisher)}} </td>
+                        <td> {{ form.Publisher( class="form-control", value=book.publisher)}} 
+                            {% if form.Publisher.errors %}
+                            <ul class="errors">
+                                {% for error in form.Publisher.errors %}
+                                    <li class ="text-danger">{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </td>
                     </tr>
                     <tr>
                         <th>Category</th>
@@ -45,17 +80,27 @@
                     <tr>
                         <th>Number of pages</th>
                         <td> {{ book.page_number }} </td>
-                        <td> {{ form.Page_number ( class="form-control", value=book.page_number)}} </td>
-                    </tr>
-                    <tr>
-                        <th>Available Copies</th>
-                        <td> {{ book.available_copies }} </td>
-                        <td> {{ form.Available_copies ( class="form-control", value=book.available_copies)}} </td>
+                        <td> {{ form.Page_number ( class="form-control", value=book.page_number)}}
+                            {% if form.Page_number.errors %}
+                            <ul class="errors">
+                                {% for error in form.Page_number.errors %}
+                                    <li class ="text-danger">{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %} </td>
                     </tr>
                     <tr>
                         <th>Summary</th>
                         <td> {{ book.summary }} </td>
-                        <td> {{ form.Summary( class="form-control", value=book.summary)}} </td>
+                        <td> {{ form.Summary( class="form-control", value=book.summary)}}
+                            {% if form.Summary.errors %}
+                            <ul class="errors">
+                                {% for error in form.Summary.errors %}
+                                    <li class ="text-danger">{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}
+                        </td>
                     </tr>
                     <tr>
                         <th>Key Words</th>
@@ -65,13 +110,22 @@
                     <tr>
                         <th>Language</th>
                         <td> {{ book.b_language }} </td>
-                        <td> {{ form.B_language( class="form-control", value=book.b_language)}} </td>
+                        <td> {{ form.B_language( class="form-control", value=book.b_language)}}
+                            {% if form.B_language.errors %}
+                            <ul class="errors">
+                                {% for error in form.B_language.errors %}
+                                    <li class ="text-danger">{{ error }}</li>
+                                {% endfor %}
+                            </ul>
+                            {% endif %}    
+                        </td>
                     </tr>
                     {% endfor %}
                     </tbody>
                 </table>                    
             </div>
-            {{form.submit}}
+
+            {{form.submit (class = "buton")}}
         </form>
     </div>
 </div>

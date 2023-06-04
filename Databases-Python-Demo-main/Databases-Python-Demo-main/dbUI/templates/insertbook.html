@@ -1,6 +1,7 @@
 {% extends "global_layout.html" %}
 {% block content %}
 <div class="container">
+    {% include "flash_messages.html" %}
     <head>
         <title>Insert new Book</title>
     </head>
@@ -15,7 +16,7 @@
                 {% if form.ISBN.errors %}
                     <ul class="errors">
                         {% for error in form.ISBN.errors %}
-                            <li>{{ error }}</li>
+                            <li class="text-danger">{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -27,7 +28,7 @@
                 {% if form.Title.errors %}
                     <ul class="errors">
                         {% for error in form.Title.errors %}
-                            <li>{{ error }}</li>
+                            <li class="text-danger">{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -39,7 +40,7 @@
                 {% if form.Publisher.errors %}
                     <ul class="errors">
                         {% for error in form.Publisher.errors %}
-                            <li>{{ error }}</li>
+                            <li class="text-danger">{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -51,7 +52,7 @@
                 {% if form.Page_number.errors %}
                     <ul class="errors">
                         {% for error in form.Page_number.errors %}
-                            <li>{{ error }}</li>
+                            <li class="text-danger">{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -63,7 +64,7 @@
                 {% if form.Summary.errors %}
                     <ul class="errors">
                         {% for error in form.Summary.errors %}
-                            <li>{{ error }}</li>
+                            <li class="text-danger">{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -75,7 +76,7 @@
                 {% if form.Available_copies.errors %}
                     <ul class="errors">
                         {% for error in form.Available_copies.errors %}
-                            <li>{{ error }}</li>
+                            <li class="text-danger">{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -87,7 +88,7 @@
                 {% if form.img.errors %}
                     <ul class="errors">
                         {% for error in form.img.errors %}
-                            <li>{{ error }}</li>
+                            <li class="text-danger">{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -99,7 +100,7 @@
                 {% if form.B_language.errors %}
                     <ul class="errors">
                         {% for error in form.B_language.errors %}
-                            <li>{{ error }}</li>
+                            <li class="text-danger">{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -111,7 +112,7 @@
                 {% if form.Authors.errors %}
                     <ul class="errors">
                         {% for error in form.Authors.errors %}
-                            <li>{{ error }}</li>
+                            <li class="text-danger">{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -130,7 +131,7 @@
                 {% if form.Category.errors %}
                     <ul class="errors">
                         {% for error in form.Category.errors %}
-                            <li>{{ error }}</li>
+                            <li class="text-danger">{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -142,14 +143,14 @@
                 {% if form.Key_words.errors %}
                     <ul class="errors">
                         {% for error in form.Key_words.errors %}
-                            <li>{{ error }}</li>
+                            <li class="text-danger">{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
             </div>
 
             <div>
-                {{ form.submit() }}
+                {{ form.submit(class="buton")}}
             </div>
         </form>
     </body>

@@ -1,19 +1,31 @@
 {% extends "global_layout.html" %}
 {% block content %}
 <div class="container">
+    {% include "flash_messages.html" %}
     <head>
         <title>Admin Page</title>
     </head>
     <div>
         <h1>Welcome to the Admin Page</h1>
 
-        <div class="button-container">
-            <button id="asteacher" onclick = "window.location.href= '/admin/operator'">Insert School</button>
-            <button id="updatebook" onclick = "window.location.href= '/admin/statistics'">View Statistics</button>
-            <form method="POST">
-                <button name ="action" value ="backup" onclick = "window.location.href= '/admin'">Back up</button>
-                <button name ="action" value ="restore" onclick = "window.location.href= '/admin'">Restore</button>
-            </form>
+        <div class="button-container2">
+            
+            <div class = "admin">
+                <button id="asteacher" onclick = "window.location.href= '/admin/operator'">Insert School</button>
+            </div>
+            <div>
+                <button id="updatebook" onclick = "window.location.href= '/admin/statistics'">View Statistics</button>
+            </div>
+            <div class="button-container2">
+                <form method="POST">
+                    <div class="button-container2">
+                        <button name ="action" value ="backup" onclick = "window.location.href= '/admin'">Back up</button>
+                    
+                    
+                        <button name ="action" value ="restore" onclick = "window.location.href= '/admin'">Restore</button>
+                    </div>
+                </form>
+        </div>
         </div>
     </div>
     

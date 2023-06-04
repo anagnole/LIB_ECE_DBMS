@@ -1,33 +1,34 @@
 {% extends "global_layout.html" %}
 {% block content %}
 <div class="container">
+    {% include "flash_messages.html" %}
     <head>
         <title>Update Books</title>
     </head>
-    <div class="button-container">
+    <div>
         <h1>Update a Book</h1>
 
         {% if books|length == 0 %}
             <h2 style="margin-top: 5rem;">No books found!</h1>
         {% else %}
-        <div class="table-responsive"></div>
-        <table id="book" class="table">
-            <thead>
-              <tr>
-                  <th>Book Title</th>
-                  <th>Available copies</th>
-                  <th></th>
-              </tr>
-            </thead>
-            <tbody>
-              {% for book in books %}
-                  <tr>
-                        <td><a class="button" onclick="window.location.href='/update_book_info/{{ book.ISBN }}'">{{ book.title }}</a></td>
-                        <td> {{ book.available_copies }} </td>
-                  </tr>
-              {% endfor %}
-          </tbody>
-          </table>
+        <div class="table-responsive">
+            <table id="book" class="table">
+                <thead>
+                <tr>
+                    <th>Book Title</th>
+                    <th>Available copies</th>
+                </tr>
+                </thead>
+                <tbody>
+                    {% for book in books %}
+                        <tr class = "clickable-row" onclick="window.location.href='/update_book_info/{{ book.ISBN }}'">
+                            <td> {{ book.title }}</td>
+                            <td> {{ book.available_copies }} </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
         {%endif%}
     </div>
 </div>

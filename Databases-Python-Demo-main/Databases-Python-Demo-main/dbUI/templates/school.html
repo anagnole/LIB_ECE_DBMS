@@ -1,6 +1,7 @@
 {% extends "global_layout.html" %}
 {% block content %}
 <div class="container">
+    {% include "flash_messages.html" %}
     <head>
         <title>Insert new School</title>
     </head>
@@ -15,7 +16,7 @@
                 {% if form.s_name.errors %}
                     <ul class="errors">
                         {% for error in form.s_name.errors %}
-                            <li>{{ error }}</li>
+                            <li class = "text-danger">{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -27,7 +28,7 @@
                 {% if form.address.errors %}
                     <ul class="errors">
                         {% for error in form.address.errors %}
-                            <li>{{ error }}</li>
+                            <li class = "text-danger">{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -39,7 +40,7 @@
                 {% if form.city.errors %}
                     <ul class="errors">
                         {% for error in form.city.errors %}
-                            <li>{{ error }}</li>
+                            <li class = "text-danger">{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -51,7 +52,7 @@
                 {% if form.phone_number.errors %}
                     <ul class="errors">
                         {% for error in form.phone_number.errors %}
-                            <li>{{ error }}</li>
+                            <li class = "text-danger">{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -63,7 +64,7 @@
                 {% if form.email.errors %}
                     <ul class="errors">
                         {% for error in form.email.errors %}
-                            <li>{{ error }}</li>
+                            <li class = "text-danger">{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
@@ -75,14 +76,14 @@
                 {% if form.p_full_name.errors %}
                     <ul class="errors">
                         {% for error in form.p_full_name.errors %}
-                            <li>{{ error }}</li>
+                            <li class = "text-danger">{{ error }}</li>
                         {% endfor %}
                     </ul>
                 {% endif %}
             </div>
 
-            <div>
-                {{ form.enter_school }}
+            <div class = "button-container2">
+                {{ form.enter_school (class="buton") }}
             </div>
         </form>
     </body>

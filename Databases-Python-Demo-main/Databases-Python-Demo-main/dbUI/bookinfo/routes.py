@@ -6,6 +6,7 @@ from dbUI.bookinfo import bookinfo
 from datetime import date
 from dbUI.bookinfo.forms import ReviewForm
 from dbUI.bookinfo.forms import UpdateBookForm
+from dbUI.bookinfo.forms import UpdateBookFormCopies
 from dbUI.student import student
 from dbUI.teacher import teacher
 
@@ -56,7 +57,7 @@ def borrow(username, ISBN):
     except Exception as e:
         # If the connection to the database fails, return HTTP response 500
         flash(str(e), "danger")
-        abort(500)
+        return redirect(url_for("bookinfo.getBookInfo", username=username, ISBN=ISBN))
 
 @bookinfo.route("/bookinfo/<string:username>/<int:ISBN>/return", methods=["POST"])
 def returnbook(username, ISBN):
@@ -86,9 +87,11 @@ def returnbook(username, ISBN):
         else:
             return redirect((url_for("teacher.getTeacher", username = username, ISBN=ISBN)))
     except Exception as e:
-        # If the connection to the database fails, return HTTP response 500
         flash(str(e), "danger")
-        abort(500)
+        if (role == 'student'):
+            return redirect((url_for("student.getStudent", username = username, ISBN=ISBN)))
+        else:
+            return redirect((url_for("teacher.getTeacher", username = username, ISBN=ISBN)))
 
 @bookinfo.route("/bookinfo/<string:username>/<int:ISBN>/cancel", methods=["POST"])
 def cancel(username, ISBN):
@@ -118,7 +121,10 @@ def cancel(username, ISBN):
     except Exception as e:
         # If the connection to the database fails, return HTTP response 500
         flash(str(e), "danger")
-        abort(500)
+        if (role == 'student'):
+            return redirect((url_for("student.getStudent", username = username, ISBN=ISBN)))
+        else:
+            return redirect((url_for("teacher.getTeacher", username = username, ISBN=ISBN)))
 
 
 @bookinfo.route("/bookinfo/<string:username>/<int:ISBN>/review", methods=["GET", "POST"])
@@ -163,16 +169,16 @@ def review(username, ISBN):
             return redirect(url_for("bookinfo.getBookInfo", username = username, ISBN = ISBN))
         except Exception as e:
             flash(str(e), "danger")
-            abort(500)
     return render_template("review.html", username=username, ISBN=ISBN, pageTitle="Review Page", form=form)
 
 @bookinfo.route("/update_book_info/<int:ISBN>", methods = ["GET", "POST"])
 def UpdateBookInfo(ISBN):
     form = UpdateBookForm()
+
     if (request.method == "POST" and form.validate_on_submit()):
         insertbookinfo = form.__dict__
         query_update_book = "UPDATE book SET Title = %s, Publisher = %s, Page_number = %s, \
-                    Summary = %s, Available_copies = %s, B_language = %s  \
+                    Summary = %s, B_language = %s  \
                     WHERE ISBN = %s;"
         query_delete_authors = "DELETE FROM written_by where isbn = %s;"
         query_pick_author = "CALL pick_author(%s, %s);"
@@ -191,35 +197,33 @@ def UpdateBookInfo(ISBN):
                     insertbookinfo["Publisher"].data,
                     insertbookinfo["Page_number"].data,
                     insertbookinfo["Summary"].data,
-                    insertbookinfo["Available_copies"].data,
                     insertbookinfo["B_language"].data,
                     ISBN
                 ),
             )
-            print("awrghwiluh")
-            cur.execute(query_delete_authors, (ISBN,))
-            print("x")
-            authors = insertbookinfo["Authors"].data.split(",")
-            print("1")
-            for author in authors:
-                cur.execute(query_pick_author, (ISBN, author.strip()))
-            cur.execute(query_delete_category, (ISBN,))
-            for category in selected_categories:
-                cur.execute(query_insert_category, (ISBN, category.strip()))
-            
-            cur.execute(query_delete_key, (ISBN,))
-            keywords = insertbookinfo["Key_words"].data.split(",")
-            for keyword in keywords:
-                cur.execute(query_insert_keywords, (ISBN, keyword.strip()))
+            if(insertbookinfo["Authors"].data):
+                cur.execute(query_delete_authors, (ISBN,))
+                authors = insertbookinfo["Authors"].data.split(",")
+                for author in authors:
+                    cur.execute(query_pick_author, (ISBN, author.strip()))
+
+            if(selected_categories):
+                cur.execute(query_delete_category, (ISBN,))
+                for category in selected_categories:
+                    cur.execute(query_insert_category, (ISBN, category.strip()))
+
+            if(insertbookinfo["Key_words"].data):
+                cur.execute(query_delete_key, (ISBN,))
+                keywords = insertbookinfo["Key_words"].data.split(",")
+                for keyword in keywords:
+                    cur.execute(query_insert_keywords, (ISBN, keyword.strip()))
 
             db.connection.commit()
             cur.close()
-            flash("Book created successfully!", "success")
+            flash("Book updated successfully!", "success")
             return redirect(url_for("bookinfo.UpdateBookInfo", ISBN=ISBN))
         except Exception as e:
-            print(e)
             flash(str(e), "danger")
-            abort(500)
 
     try:
         cur = db.connection.cursor()
@@ -234,9 +238,24 @@ def UpdateBookInfo(ISBN):
         column_names = [i[0] for i in cur.description]
         books = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
         cur.close()
-        return render_template("update_book_info.html", books = books, isbn = ISBN, form = form, pageTitle = "Book Info")
+        return render_template("update_book_info.html", books = books, ISBN = ISBN, form = form, pageTitle = "Book Info")
     except Exception as e:
         print(e)
-        ## if the connection to the database fails, return HTTP response 500
         flash(str(e), "danger")
         abort(500)
+
+@bookinfo.route("/update_book_info/add/<int:ISBN>", methods = ["GET", "POST"])
+def UpdateBookCopy(ISBN):
+        if(request.method == "POST"):
+            query = "CALL update_copies(%s);"
+            try:
+                cur = db.connection.cursor()
+                cur.execute(query,(ISBN,))
+                db.connection.commit()
+                cur.close()
+                flash("Added book copy successfully!", "success")
+                return redirect(url_for("bookinfo.UpdateBookInfo", ISBN=ISBN))
+            except Exception as e:
+                flash(str(e), "danger")
+                return redirect(url_for("bookinfo.UpdateBookInfo", ISBN=ISBN))
+          

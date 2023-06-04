@@ -45,11 +45,6 @@ class UpdateBookForm(FlaskForm):
     
     Summary = StringField(label = "Summary", validators = [DataRequired(message = "Summary is a required field.")])
 
-    Available_copies = IntegerField(
-        label = "Available copies",
-        validators = [DataRequired(message = "Available Copies is a required field.")]
-    )
-
     B_language = StringField(label = "Book's Language", validators = [DataRequired(message = "Language is a required field.")])
     
     Authors = StringField(label = "Authors", validators = [DataRequired(message = "Authors is a required field.")])
@@ -71,6 +66,9 @@ class UpdateBookForm(FlaskForm):
     Key_words = StringField(label = "Key words", validators = [DataRequired(message = "Key words is a required field.")])
 
     submit = SubmitField("Update")   
+
+class UpdateBookFormCopies(FlaskForm):
+    submit = SubmitField("Add copy")
 
 class ReviewForm(FlaskForm):  
     Comments = StringField(label="Comments", validators=[Optional()])

@@ -1,6 +1,7 @@
 {% extends "global_layout.html" %}
 {% block content %}
 <div class="container">
+    {% include "flash_messages.html" %}
     <head>
         <title>Approve Library Cards and Reviews</title>
     </head>
@@ -40,6 +41,7 @@
                         <th>Username</th>
                         <th>Rating</th>
                         <th>Comments</th>
+                        <th>ISBN</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -47,7 +49,8 @@
                     <tr class="clickable-row" onclick="location.href='/operator/{{ username }}/approve/review?username={{ review.username }}';">
                         <td>{{ review.username }}</td>
                         <td>{{ review.rating }}</td>
-                        <td>{{ review.comments }}</td>                  
+                        <td>{{ review.comments }}</td> 
+                        <td>{{review.ISBN}}</td>                 
                     </tr>
                     {% endfor %}
                 </tbody>
