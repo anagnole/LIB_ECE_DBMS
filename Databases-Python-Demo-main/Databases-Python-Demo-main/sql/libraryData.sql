@@ -62,6 +62,9 @@ IF EXISTS (SELECT 1 FROM book WHERE Available_copies = 0 AND ISBN = NEWISBN) THE
     union (SELECT isbn FROM reserves WHERE username = NEWusername AND DATEDIFF(current_timestamp, r_date) < 7)) AS omit) = 2))
       THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sorry, Student-user cannot reserve more than 2 books per week at the same time.';
   END IF;
+  IF EXISTS(SELECT 1 FROM borrows WHERE ISBN = NEWISBN AND username = NEWusername)
+    THEN SIGNAL SQLSTATE '45000' SET MESSAGE_TEXT = 'Sorry, Student-user cannot reserve a book he has borrowed.';
+  END IF;
   INSERT INTO RESERVES (USERNAME, ISBN, R_DATE) VALUES (NEWusername, NEWISBN, NEWB_DATE);
   
 ELSE 
