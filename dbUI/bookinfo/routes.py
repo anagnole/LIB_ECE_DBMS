@@ -28,12 +28,16 @@ def getBookInfo(username, ISBN):
         WHERE b.isbn = {};").format(ISBN)
         cur.execute(query)
         column_names = [i[0] for i in cur.description]
-        query = "SELECT AVG(rating) as rating FROM reviews WHERE ISBN = {}".format(ISBN)
+        query = "SELECT AVG(rating) as rating FROM reviews WHERE ISBN = {};".format(ISBN)
         books = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
         cur.execute(query)
+        query = "SELECT comments, rating, username FROM reviews WHERE ISBN = {} AND needs_approval = 0;".format(ISBN)
         ratings = [dict(zip("rating",cur.fetchone()))]
+        cur.execute(query)
+        column_names = [i[0] for i in cur.description]
+        reviews = [dict(zip(column_names, entry)) for entry in cur.fetchall()]
         cur.close()
-        return render_template("bookinfo.html", books = books,ratings = ratings[0], username = username, isbn = ISBN, pageTitle = "Book Info")
+        return render_template("bookinfo.html", books = books,ratings = ratings[0], reviews = reviews, username = username, isbn = ISBN, pageTitle = "Book Info")
     except Exception as e:
         flash(str(e), "danger")
         abort(500)

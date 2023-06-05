@@ -99,13 +99,13 @@ CREATE TABLE Category(
 );
 
 CREATE TABLE Reviews(
- Review_ID INT NOT NULL AUTO_INCREMENT,
+ Review_ID INT NOT NULL ,
  Rating INT NOT NULL check (Rating > -1 and Rating < 6),
  Needs_approval BOOLEAN NOT NULL,
  Username VARCHAR(20) NOT NULL,
  ISBN INT NOT NULL, 
  Comments VARCHAR(255) DEFAULT NULL,
- PRIMARY KEY(Review_ID),
+ PRIMARY KEY(Username,ISBN),
  constraint fk_reviews_username foreign key (Username) references Users (Username) on delete cascade on update cascade,
  constraint fk_reviews_ISBN foreign key (ISBN) references Book (ISBN) on delete cascade on update cascade
 );
